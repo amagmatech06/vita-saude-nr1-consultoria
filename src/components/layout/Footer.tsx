@@ -135,8 +135,6 @@ export function Footer() {
                   {site.whatsapp.display}
                 </WhatsappLink>
               </li>
-              <li className={linkClass}>{site.email}</li>
-              <li className={linkClass}>{site.city}</li>
             </ul>
           </div>
         </div>
@@ -146,7 +144,7 @@ export function Footer() {
           style={{ borderColor: BORDER, color: "rgba(249, 249, 251, 0.62)" }}
         >
           <p>
-            © {new Date().getFullYear()} {site.name} · {site.cnpj}
+            © {new Date().getFullYear()} {site.name}
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacidade" className="transition-colors hover:text-[#F9F9FB]">

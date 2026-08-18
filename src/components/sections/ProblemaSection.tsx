@@ -1,6 +1,7 @@
 import { BlurFade } from "@/components/BlurFade";
 import { ShieldIcon, BrainIcon } from "@/components/icons";
 import { SectionContainer } from "@/components/ui/layout/SectionContainer";
+import { CountUp } from "@/components/ui/CountUp";
 import { SectionHeading } from "@/components/ui/layout/SectionHeading";
 import { indicadores, problema } from "@/config/ebook-content";
 
@@ -87,7 +88,7 @@ export function ProblemaSection() {
 
       {/* Indicadores do material (p.10) — nao sao resultados de clientes */}
       <BlurFade index={3}>
-        <div className="mt-14 border-t pt-10" style={{ borderColor: "rgba(37, 37, 52, 0.12)" }}>
+        <div className="mt-14 border-t pt-10 text-center sm:text-left" style={{ borderColor: "rgba(37, 37, 52, 0.12)" }}>
           <p
             className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
             style={{ color: "rgba(37, 37, 52, 0.68)" }}
@@ -96,14 +97,14 @@ export function ProblemaSection() {
           </p>
 
           <div className="mt-7 grid gap-8 sm:grid-cols-3">
-            {indicadores.numeros.map((numero) => (
-              <div key={numero.label} className="flex flex-col gap-1.5">
-                <span
+            {indicadores.numeros.map((numero, i) => (
+              <div key={numero.label} className="flex flex-col items-center sm:items-start gap-1.5">
+                <CountUp
+                  value={numero.valor}
+                  delay={i * 0.12}
                   className="stat-number text-[2.75rem] md:text-[3.25rem]"
                   style={{ color: "#4544BD" }}
-                >
-                  {numero.valor}
-                </span>
+                />
                 <span
                   className="text-[0.75rem] font-bold uppercase tracking-[0.12em]"
                   style={{ color: "rgba(37, 37, 52, 0.68)" }}
