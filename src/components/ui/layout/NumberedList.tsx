@@ -27,9 +27,9 @@ export function NumberedList({
   const isLight = tone === "light";
 
   const numberColor = isLight ? "rgba(249, 249, 251, 0.35)" : "rgba(69, 68, 189, 0.45)";
-  const titleColor = isLight ? "#F9F9FB" : "#252534";
-  const textColor = isLight ? "rgba(249, 249, 251, 0.7)" : "rgba(37, 37, 52, 0.68)";
-  const borderColor = isLight ? "rgba(249, 249, 251, 0.14)" : "rgba(37, 37, 52, 0.1)";
+  const titleColor = isLight ? "#F9F9FB" : "#070A26";
+  const textColor = isLight ? "rgba(249, 249, 251, 0.7)" : "rgba(7, 10, 38, 0.68)";
+  const borderColor = isLight ? "rgba(249, 249, 251, 0.14)" : "rgba(7, 10, 38, 0.1)";
 
   return (
     <ol className={cn("grid gap-0", columns === 2 && "md:grid-cols-2 md:gap-x-12", className)}>

@@ -22,11 +22,11 @@ const VARIANTS: Record<CTAVariant, { className: string; style: React.CSSProperti
   /** Amarelo gema. Acento raro — no maximo 2 usos por pagina, contando o quote. */
   primary: {
     className: "hover:-translate-y-0.5 hover:brightness-95",
-    style: { background: "#FEC717", color: "#252534" },
+    style: { background: "#FEC717", color: "#070A26" },
   },
   secondary: {
     className: "border hover:-translate-y-0.5",
-    style: { background: "transparent", color: "#252534", borderColor: "rgba(37, 37, 52, 0.22)" },
+    style: { background: "transparent", color: "#070A26", borderColor: "rgba(7, 10, 38, 0.22)" },
   },
   "ghost-light": {
     className: "border hover:-translate-y-0.5 hover:bg-white/10",

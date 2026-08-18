@@ -1,8 +1,10 @@
+import Image from "next/image";
 import { BlurFade } from "@/components/BlurFade";
 import { SectionContainer } from "@/components/ui/layout/SectionContainer";
 import { SectionHeading } from "@/components/ui/layout/SectionHeading";
 import { NumberedList } from "@/components/ui/layout/NumberedList";
 import { capitulos } from "@/config/ebook-content";
+import { site } from "@/config/site";
 
 export function CapitulosSection() {
   const items = capitulos.items.map((item) => ({
@@ -22,6 +24,15 @@ export function CapitulosSection() {
             description={capitulos.description}
             size="md"
           />
+          <div className="mt-10 lg:mt-16 flex justify-center lg:justify-start">
+            <Image
+              src={site.ebook.cover}
+              alt="Capa do e-book"
+              width={400}
+              height={566}
+              className="w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[340px] rounded-xl shadow-[0_20px_50px_-15px_rgba(7,10,38,0.2)] rotate-[-3deg]"
+            />
+          </div>
         </BlurFade>
 
         <BlurFade index={1}>

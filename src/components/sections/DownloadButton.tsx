@@ -11,7 +11,7 @@ export function DownloadButton({ label }: { label: string }) {
       download={site.ebook.downloadAs}
       onClick={() => track("ebook_download", { source: "obrigado" })}
       className="inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-full px-7 text-[0.9375rem] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:brightness-95"
-      style={{ background: "#FEC717", color: "#252534" }}
+      style={{ background: "#FEC717", color: "#070A26" }}
     >
       <DownloadIcon className="h-[18px] w-[18px]" />
       {label}

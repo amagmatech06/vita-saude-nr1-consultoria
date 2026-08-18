@@ -31,7 +31,7 @@ export default function PrivacidadePage() {
       <SectionContainer bg="white" width="narrow">
         <div
           className="prose prose-neutral max-w-none prose-headings:font-serif prose-headings:tracking-[-0.02em] prose-a:text-[#4544BD]"
-          style={{ color: "rgba(37, 37, 52, 0.82)" }}
+          style={{ color: "rgba(7, 10, 38, 0.82)" }}
         >
           <p>
             Esta política descreve como os dados pessoais informados neste site são coletados,
@@ -109,7 +109,7 @@ export default function PrivacidadePage() {
             atualização.
           </p>
 
-          <p style={{ color: "rgba(37, 37, 52, 0.68)" }}>
+          <p style={{ color: "rgba(7, 10, 38, 0.68)" }}>
             <em>Última atualização: [PLACEHOLDER: data de publicação]</em>
           </p>
         </div>

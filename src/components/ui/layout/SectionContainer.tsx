@@ -10,10 +10,10 @@ export type SectionBg = "white" | "neutra" | "indigo" | "petroleo";
  * passa a sua propria (ex.: `className="bg-something"`).
  */
 const BACKGROUNDS: Record<SectionBg, { background: string; color: string }> = {
-  white: { background: "#FFFFFF", color: "#252534" },
-  neutra: { background: "#F1F1F1", color: "#252534" },
+  white: { background: "#FFFFFF", color: "#070A26" },
+  neutra: { background: "#F1F1F1", color: "#070A26" },
   indigo: { background: "#4544BD", color: "#F9F9FB" },
-  petroleo: { background: "#252534", color: "#F9F9FB" },
+  petroleo: { background: "#070A26", color: "#F9F9FB" },
 };
 
 const IS_DARK: Record<SectionBg, boolean> = {

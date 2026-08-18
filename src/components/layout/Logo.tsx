@@ -17,8 +17,8 @@ type LogoProps = {
  * arquivo vetorial oficial chegar — basta trocar o `src` abaixo.
  */
 export function Logo({ tone = "light", className, withFounder = false }: LogoProps) {
-  const color = tone === "light" ? "#F9F9FB" : "#252534";
-  const subColor = tone === "light" ? "rgba(249, 249, 251, 0.62)" : "rgba(37, 37, 52, 0.68)";
+  const color = tone === "light" ? "#F9F9FB" : "#070A26";
+  const subColor = tone === "light" ? "rgba(249, 249, 251, 0.62)" : "rgba(7, 10, 38, 0.68)";
 
   return (
     <Link

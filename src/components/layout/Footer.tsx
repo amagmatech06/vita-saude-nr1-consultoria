@@ -34,7 +34,7 @@ export function Footer() {
   return (
     <footer
       className="relative isolate overflow-hidden"
-      style={{ background: "#252534", color: LIGHT_STRONG }}
+      style={{ background: "#070A26", color: LIGHT_STRONG }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci" />
 

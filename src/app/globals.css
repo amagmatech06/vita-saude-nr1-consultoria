@@ -6,7 +6,7 @@
    ========================================================================== */
 @theme {
   /* Cores da marca */
-  --color-petroleo: #252534; /* escura profunda: texto, navbar, footer */
+  --color-petroleo: #070A26; /* escura profunda: texto, navbar, footer */
   --color-indigo: #4544bd; /* principal escura: heros, secoes de destaque */
   --color-indigo-soft: #5453c1; /* variacao para gradientes */
   --color-gema: #fec717; /* ACENTO RARO — max. 2 usos por pagina */

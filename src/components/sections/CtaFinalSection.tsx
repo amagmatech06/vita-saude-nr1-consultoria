@@ -29,7 +29,7 @@ export function CtaFinalSection() {
                 source="cta_final"
                 message="Olá, Gabi! Li o guia da NR-1 e quero conversar sobre a minha empresa."
                 className="group inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-full px-7 text-[0.9375rem] font-bold transition-all duration-200 hover:-translate-y-0.5"
-                style={{ background: "#F9F9FB", color: "#252534" }}
+                style={{ background: "#F9F9FB", color: "#070A26" }}
               >
                 <WhatsappIcon className="h-[18px] w-[18px]" />
                 {ctaFinal.botao}

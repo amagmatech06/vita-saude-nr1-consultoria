@@ -31,14 +31,14 @@ export function ProblemaSection() {
                 className="flex h-full flex-col gap-5 rounded-2xl p-7 lg:p-9"
                 style={
                   destaque
-                    ? { background: "#252534", color: "#F9F9FB" }
-                    : { background: "#FFFFFF", border: "1px solid rgba(37, 37, 52, 0.08)" }
+                    ? { background: "#070A26", color: "#F9F9FB" }
+                    : { background: "#FFFFFF", border: "1px solid rgba(7, 10, 38, 0.08)" }
                 }
               >
                 <div className="flex items-center justify-between gap-4">
                   <p
                     className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
-                    style={{ color: destaque ? "rgba(249, 249, 251, 0.62)" : "rgba(37, 37, 52, 0.68)" }}
+                    style={{ color: destaque ? "rgba(249, 249, 251, 0.62)" : "rgba(7, 10, 38, 0.68)" }}
                   >
                     {coluna.eyebrow}
                   </p>
@@ -50,7 +50,7 @@ export function ProblemaSection() {
 
                 <h3
                   className="font-serif text-[1.625rem] font-bold md:text-[1.875rem]"
-                  style={{ color: destaque ? "#F9F9FB" : "#252534" }}
+                  style={{ color: destaque ? "#F9F9FB" : "#070A26" }}
                 >
                   {coluna.title}
                 </h3>
@@ -60,7 +60,7 @@ export function ProblemaSection() {
                     <li
                       key={item}
                       className="flex items-start gap-3 text-[0.9375rem] leading-[1.6] md:text-[1rem]"
-                      style={{ color: destaque ? "rgba(249, 249, 251, 0.78)" : "rgba(37, 37, 52, 0.72)" }}
+                      style={{ color: destaque ? "rgba(249, 249, 251, 0.78)" : "rgba(7, 10, 38, 0.72)" }}
                     >
                       <span
                         aria-hidden
@@ -88,10 +88,10 @@ export function ProblemaSection() {
 
       {/* Indicadores do material (p.10) — nao sao resultados de clientes */}
       <BlurFade index={3}>
-        <div className="mt-14 border-t pt-10 text-center sm:text-left" style={{ borderColor: "rgba(37, 37, 52, 0.12)" }}>
+        <div className="mt-14 border-t pt-10 text-center sm:text-left" style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}>
           <p
             className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
-            style={{ color: "rgba(37, 37, 52, 0.68)" }}
+            style={{ color: "rgba(7, 10, 38, 0.68)" }}
           >
             {indicadores.eyebrow}
           </p>
@@ -107,7 +107,7 @@ export function ProblemaSection() {
                 />
                 <span
                   className="text-[0.75rem] font-bold uppercase tracking-[0.12em]"
-                  style={{ color: "rgba(37, 37, 52, 0.68)" }}
+                  style={{ color: "rgba(7, 10, 38, 0.68)" }}
                 >
                   {numero.label}
                 </span>
@@ -115,7 +115,7 @@ export function ProblemaSection() {
             ))}
           </div>
 
-          <p className="mt-6 text-[0.8125rem]" style={{ color: "rgba(37, 37, 52, 0.68)" }}>
+          <p className="mt-6 text-[0.8125rem]" style={{ color: "rgba(7, 10, 38, 0.68)" }}>
             {indicadores.notaFonte}
           </p>
         </div>

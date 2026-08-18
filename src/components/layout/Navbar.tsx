@@ -25,7 +25,7 @@ export function Navbar() {
     <header
       className="fixed inset-x-0 top-0 z-50 transition-shadow duration-300"
       style={{
-        background: "#252534",
+        background: "#070A26",
         boxShadow: scrolled ? "0 1px 0 rgba(249, 249, 251, 0.12)" : "none",
       }}
     >

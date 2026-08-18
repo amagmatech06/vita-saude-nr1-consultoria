@@ -18,16 +18,16 @@ export function SobreSection() {
               width={1000}
               height={722}
               sizes="(min-width: 1024px) 380px, 100vw"
-              className="w-full rounded-2xl object-cover"
+              className="w-full h-[320px] sm:h-[400px] lg:h-auto rounded-2xl object-cover object-[center_15%] lg:object-top"
             />
             <div
               className="mt-5 border-l-2 pl-5"
               style={{ borderColor: "#4544BD" }}
             >
-              <p className="font-serif text-[1.375rem] font-bold" style={{ color: "#252534" }}>
+              <p className="font-serif text-[1.375rem] font-bold" style={{ color: "#070A26" }}>
                 {sobre.title}
               </p>
-              <p className="text-[0.9375rem]" style={{ color: "rgba(37, 37, 52, 0.68)" }}>
+              <p className="text-[0.9375rem]" style={{ color: "rgba(7, 10, 38, 0.68)" }}>
                 {sobre.role}
               </p>
             </div>
@@ -42,7 +42,7 @@ export function SobreSection() {
                 <p
                   key={i}
                   className="max-w-[62ch] text-[1rem] leading-[1.75] md:text-[1.0625rem]"
-                  style={{ color: "rgba(37, 37, 52, 0.78)" }}
+                  style={{ color: "rgba(7, 10, 38, 0.78)" }}
                 >
                   {paragrafo}
                 </p>
@@ -51,10 +51,10 @@ export function SobreSection() {
           </BlurFade>
 
           <BlurFade index={2}>
-            <div className="border-t pt-8" style={{ borderColor: "rgba(37, 37, 52, 0.12)" }}>
+            <div className="border-t pt-8" style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}>
               <p
                 className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
-                style={{ color: "rgba(37, 37, 52, 0.68)" }}
+                style={{ color: "rgba(7, 10, 38, 0.68)" }}
               >
                 {sobre.areasEyebrow}
               </p>
@@ -63,7 +63,7 @@ export function SobreSection() {
                   <li
                     key={area}
                     className="flex items-start gap-3 text-[0.9375rem] leading-[1.55] md:text-[1rem]"
-                    style={{ color: "rgba(37, 37, 52, 0.8)" }}
+                    style={{ color: "rgba(7, 10, 38, 0.8)" }}
                   >
                     <CheckIcon className="mt-[0.3em] h-4 w-4 flex-none" style={{ color: "#4544BD" }} />
                     {area}

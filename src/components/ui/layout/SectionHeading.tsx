@@ -55,9 +55,9 @@ export function SectionHeading({
   className,
 }: SectionHeadingProps) {
   const parts = splitOnAccent(title, accent);
-  const titleColor = tone === "light" ? "#F9F9FB" : "#252534";
+  const titleColor = tone === "light" ? "#F9F9FB" : "#070A26";
   const descriptionColor =
-    tone === "light" ? "rgba(249, 249, 251, 0.78)" : "rgba(37, 37, 52, 0.72)";
+    tone === "light" ? "rgba(249, 249, 251, 0.78)" : "rgba(7, 10, 38, 0.72)";
 
   return (
     <div

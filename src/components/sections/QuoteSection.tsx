@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BlurFade } from "@/components/BlurFade";
 import { SectionContainer } from "@/components/ui/layout/SectionContainer";
 import { quote } from "@/config/ebook-content";
@@ -41,13 +42,28 @@ export function QuoteSection() {
           </blockquote>
 
           <figcaption className="flex items-center gap-4">
-            <span aria-hidden className="h-px w-10" style={{ background: "rgba(249, 249, 251, 0.35)" }} />
-            <span
-              className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
-              style={{ color: "rgba(249, 249, 251, 0.7)" }}
-            >
-              {quote.autor}
-            </span>
+            <Image
+              src="/gabi/foto-perfil.png"
+              alt={quote.autor}
+              width={64}
+              height={64}
+              className="h-16 w-16 flex-none rounded-full object-cover object-[center_20%] border-2"
+              style={{ borderColor: "rgba(249, 249, 251, 0.15)" }}
+            />
+            <div className="flex flex-col justify-center gap-1">
+              <span
+                className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
+                style={{ color: "#F9F9FB" }}
+              >
+                {quote.autor}
+              </span>
+              <span
+                className="text-[0.8125rem]"
+                style={{ color: "rgba(249, 249, 251, 0.6)" }}
+              >
+                Especialista em NR-1
+              </span>
+            </div>
           </figcaption>
         </figure>
       </BlurFade>

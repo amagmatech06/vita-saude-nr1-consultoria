@@ -18,12 +18,12 @@ export function FaqSection() {
               <details
                 key={item.pergunta}
                 className="group border-t"
-                style={{ borderColor: "rgba(37, 37, 52, 0.12)" }}
+                style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
                   <h3
                     className="font-serif text-[1.125rem] font-bold leading-[1.35] md:text-[1.25rem]"
-                    style={{ color: "#252534" }}
+                    style={{ color: "#070A26" }}
                   >
                     {item.pergunta}
                   </h3>
@@ -34,7 +34,7 @@ export function FaqSection() {
                 </summary>
                 <p
                   className="max-w-[64ch] pb-7 pr-10 text-[0.9375rem] leading-[1.75] md:text-[1rem]"
-                  style={{ color: "rgba(37, 37, 52, 0.72)" }}
+                  style={{ color: "rgba(7, 10, 38, 0.72)" }}
                 >
                   {item.resposta}
                 </p>

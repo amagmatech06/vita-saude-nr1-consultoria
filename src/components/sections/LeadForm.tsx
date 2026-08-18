@@ -17,9 +17,9 @@ type FormValues = {
   website: string;
 };
 
-const INK = "#252534";
-const MUTED = "rgba(37, 37, 52, 0.68)";
-const BORDER = "rgba(37, 37, 52, 0.16)";
+const INK = "#070A26";
+const MUTED = "rgba(7, 10, 38, 0.68)";
+const BORDER = "rgba(7, 10, 38, 0.16)";
 const DANGER = "#B42318";
 
 function Field({
@@ -66,7 +66,7 @@ export function LeadForm() {
   });
 
   const inputClass =
-    "min-h-[52px] w-full rounded-xl border bg-white px-4 text-[1rem] outline-none transition-colors placeholder:text-[rgba(37,37,52,0.38)] focus:border-[#4544BD]";
+    "min-h-[52px] w-full rounded-xl border bg-white px-4 text-[1rem] outline-none transition-colors placeholder:text-[rgba(7, 10, 38,0.38)] focus:border-[#4544BD]";
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
@@ -208,7 +208,7 @@ export function LeadForm() {
           )}
         </button>
 
-        <p className="text-center text-[0.75rem]" style={{ color: "rgba(37, 37, 52, 0.68)" }}>
+        <p className="text-center text-[0.75rem]" style={{ color: "rgba(7, 10, 38, 0.68)" }}>
           Seus dados não são compartilhados com terceiros.
         </p>
       </form>

@@ -47,25 +47,25 @@ function emailHtml(nome: string, downloadUrl: string) {
   return `<!doctype html>
 <html lang="pt-BR"><body style="margin:0;padding:32px 16px;background:#F1F1F1;font-family:Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:16px;overflow:hidden;">
-    <tr><td style="background:#252534;padding:32px 32px 28px;">
+    <tr><td style="background:#070A26;padding:32px 32px 28px;">
       <p style="margin:0 0 10px;color:rgba(249,249,251,.6);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;">${site.ebook.edition}</p>
       <h1 style="margin:0;color:#F9F9FB;font-size:26px;line-height:1.25;font-weight:700;">${site.ebook.title}</h1>
       <p style="margin:8px 0 0;color:rgba(249,249,251,.72);font-size:14px;line-height:1.6;">${site.ebook.subtitle}</p>
     </td></tr>
     <tr><td style="padding:32px;">
-      <p style="margin:0 0 16px;color:#252534;font-size:16px;line-height:1.7;">Olá, ${primeiroNome}!</p>
-      <p style="margin:0 0 24px;color:rgba(37,37,52,.78);font-size:15px;line-height:1.7;">
+      <p style="margin:0 0 16px;color:#070A26;font-size:16px;line-height:1.7;">Olá, ${primeiroNome}!</p>
+      <p style="margin:0 0 24px;color:rgba(7, 10, 38,.78);font-size:15px;line-height:1.7;">
         Seu guia está pronto. São 28 páginas com conceitos, ferramentas, indicadores
         e o passo a passo completo da adequação à NR-1.
       </p>
-      <a href="${downloadUrl}" style="display:inline-block;background:#FEC717;color:#252534;text-decoration:none;font-weight:700;font-size:15px;padding:16px 28px;border-radius:999px;">Baixar o PDF</a>
-      <p style="margin:28px 0 0;padding-top:24px;border-top:1px solid rgba(37,37,52,.1);color:rgba(37,37,52,.6);font-size:14px;line-height:1.7;">
+      <a href="${downloadUrl}" style="display:inline-block;background:#FEC717;color:#070A26;text-decoration:none;font-weight:700;font-size:15px;padding:16px 28px;border-radius:999px;">Baixar o PDF</a>
+      <p style="margin:28px 0 0;padding-top:24px;border-top:1px solid rgba(7, 10, 38,.1);color:rgba(7, 10, 38,.6);font-size:14px;line-height:1.7;">
         Qualquer dúvida sobre a implementação na sua empresa, é só responder este e-mail
         ou chamar no WhatsApp ${site.whatsapp.display}.
       </p>
-      <p style="margin:20px 0 0;color:#252534;font-size:14px;line-height:1.6;">
+      <p style="margin:20px 0 0;color:#070A26;font-size:14px;line-height:1.6;">
         <strong>${site.founder.name}</strong><br />
-        <span style="color:rgba(37,37,52,.6);">${site.founder.role}</span>
+        <span style="color:rgba(7, 10, 38,.6);">${site.founder.role}</span>
       </p>
     </td></tr>
   </table>

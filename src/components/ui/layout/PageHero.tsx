@@ -61,7 +61,7 @@ export function PageHero({
 
   return (
     <section
-      style={{ background: "#252534", color: "#F9F9FB" }}
+      style={{ background: "#070A26", color: "#F9F9FB" }}
       className={cn("relative isolate overflow-hidden", className)}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci-fade" />

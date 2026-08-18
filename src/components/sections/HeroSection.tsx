@@ -18,7 +18,7 @@ export function HeroSection() {
   return (
     <section
       className="relative isolate overflow-hidden"
-      style={{ background: "#252534", color: "#F9F9FB" }}
+      style={{ background: "#070A26", color: "#F9F9FB" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci-fade" />
       <div
@@ -83,12 +83,12 @@ export function HeroSection() {
 
             <div className="mt-2 flex items-center gap-5">
               <Image
-                src={site.ebook.cover}
-                alt={`Capa do e-book ${site.ebook.title}`}
-                width={168}
-                height={238}
-                priority
-                className="w-[132px] flex-none rotate-[-3deg] rounded-md shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] sm:w-[150px]"
+                src="/gabi/gabriela-moreira2.jpeg"
+                alt={site.founder.name}
+                width={96}
+                height={96}
+                className="h-20 w-20 flex-none rounded-full object-cover object-[center_20%] shadow-lg border-2"
+                style={{ borderColor: "rgba(249, 249, 251, 0.15)" }}
               />
               <div className="flex flex-col gap-1">
                 <p
