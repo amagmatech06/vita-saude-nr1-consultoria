@@ -11,6 +11,7 @@ import { track } from "@/lib/analytics";
 type FormValues = {
   nome: string;
   email: string;
+  telefone: string;
   empresa: string;
   consent: boolean;
   /** Honeypot — invisivel para pessoas, preenchido por bots. */
@@ -62,7 +63,7 @@ export function LeadForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    defaultValues: { nome: "", email: "", empresa: "", consent: false, website: "" },
+    defaultValues: { nome: "", email: "", telefone: "", empresa: "", consent: false, website: "" },
   });
 
   const inputClass =
@@ -134,6 +135,23 @@ export function LeadForm() {
             {...register("email", {
               required: "Informe seu e-mail.",
               pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, message: "E-mail inválido." },
+            })}
+          />
+        </Field>
+
+        <Field label="WhatsApp / Telefone" htmlFor={`${id}-telefone`} error={errors.telefone?.message}>
+          <input
+            id={`${id}-telefone`}
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="(11) 99999-9999"
+            className={inputClass}
+            style={{ borderColor: errors.telefone ? DANGER : BORDER, color: INK }}
+            aria-invalid={Boolean(errors.telefone)}
+            {...register("telefone", {
+              required: "Informe seu telefone / WhatsApp.",
+              minLength: { value: 10, message: "Telefone inválido." },
             })}
           />
         </Field>

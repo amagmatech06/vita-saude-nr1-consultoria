@@ -4,6 +4,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 
 import { site } from "@/config/site";
 
@@ -19,6 +20,7 @@ const ATTACH_PDF = process.env.EMAIL_ATTACH_PDF !== "false";
 const leadSchema = z.object({
   nome: z.string().trim().min(2, "Informe seu nome.").max(80),
   email: z.email("E-mail inválido.").max(160),
+  telefone: z.string().trim().min(10, "Telefone inválido.").max(20),
   empresa: z.string().trim().min(2, "Informe a empresa.").max(120),
   consent: z.literal(true, { message: "É preciso aceitar para receber o material." }),
   /**
@@ -98,14 +100,60 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, fieldErrors }, { status: 422 });
   }
 
-  const { nome, email, empresa, website } = parsed.data;
+  const { nome, email, telefone, empresa, website } = parsed.data;
 
   // Honeypot preenchido: responde 200 para nao dar pista ao bot.
   if (website) return NextResponse.json({ ok: true });
 
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { error: dbError } = await supabase.from('leads').insert([{ nome, email, telefone, empresa }]);
+    if (dbError) {
+      console.error("[lead] Falha ao inserir no Supabase:", dbError);
+    }
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM;
   const downloadUrl = `${site.url}${site.ebook.file}`;
+
+  const evoUrl = process.env.EVOLUTION_API_URL;
+  const evoKey = process.env.EVOLUTION_API_KEY;
+  const evoInstance = process.env.EVOLUTION_API_INSTANCE;
+
+  if (evoUrl && evoKey && evoInstance) {
+    try {
+      // Deixa so os numeros e adiciona 55 se nao tiver. Ex: (11) 99999-9999 -> 5511999999999
+      let number = telefone.replace(/\D/g, "");
+      if (number.length === 10 || number.length === 11) {
+        number = `55${number}`;
+      }
+      
+      const whatsAppReq = await fetch(`${evoUrl}/message/sendText/${evoInstance}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": evoKey,
+        },
+        body: JSON.stringify({
+          number: number,
+          options: { delay: 1200, presence: "composing" },
+          textMessage: {
+            text: `Olá ${nome.split(" ")[0]}, tudo bem? Seu guia da NR-1 está pronto! 🎉\n\nAcesse o link abaixo para baixar o material e começar a aplicar na sua empresa:\n\n${downloadUrl}\n\nQualquer dúvida sobre a implementação na sua empresa, é só responder por aqui.`,
+          }
+        })
+      });
+
+      if (!whatsAppReq.ok) {
+        console.error("[lead] Falha ao enviar WhatsApp:", await whatsAppReq.text());
+      }
+    } catch (e) {
+      console.error("[lead] Falha ao enviar WhatsApp:", e);
+    }
+  }
 
   // Sem chave configurada o site nao quebra: o lead e registrado e o visitante
   // segue para /obrigado, onde baixa o PDF direto.
@@ -113,6 +161,7 @@ export async function POST(request: Request) {
     console.warn("[lead] RESEND_API_KEY/RESEND_FROM ausentes — e-mail nao enviado.", {
       nome,
       email,
+      telefone,
       empresa,
     });
     return NextResponse.json({ ok: true, emailSent: false });
@@ -152,7 +201,7 @@ export async function POST(request: Request) {
         from,
         to: notify,
         subject: `Novo lead: ${nome} — ${empresa}`,
-        text: `Nome: ${nome}\nE-mail: ${email}\nEmpresa: ${empresa}\nOrigem: landing do e-book`,
+        text: `Nome: ${nome}\nE-mail: ${email}\nTelefone: ${telefone}\nEmpresa: ${empresa}\nOrigem: landing do e-book`,
       });
     }
 

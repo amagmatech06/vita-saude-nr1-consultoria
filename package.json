@@ -13,6 +13,7 @@
     "content:watch": "velite --watch"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/typography": "^0.5.20",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.0",
