@@ -85,9 +85,9 @@ export function HeroSection() {
               <Image
                 src="/gabi/gabriela-moreira2.jpeg"
                 alt={site.founder.name}
-                width={96}
-                height={96}
-                className="h-20 w-20 flex-none rounded-full object-cover object-[center_20%] shadow-lg border-2"
+                width={144}
+                height={144}
+                className="h-36 w-36 flex-none rounded-full object-cover object-[center_20%] shadow-lg border-2"
                 style={{ borderColor: "rgba(249, 249, 251, 0.15)" }}
               />
               <div className="flex flex-col gap-1">

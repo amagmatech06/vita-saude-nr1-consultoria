@@ -14,9 +14,9 @@ export const hero = {
   title: "NR-1 na prática",
   titleAccent: "na prática",
   subtitle: "O Guia Completo para Gestão de Riscos Psicossociais nas Empresas",
-  // Verbatim, cap. 01 "Apresentacao" (p.3)
+  // Copy direcionado para PMEs (5-100 funcionarios)
   description:
-    "Criado para ajudar gestores e empresários a entenderem a NR-1 de forma prática e acessível, mostrando como implementar ações efetivas no dia a dia da operação.",
+    "Para empresas de 5 a 100 funcionários que precisam se adequar à NR-1 sem burocracia — e transformar uma obrigação legal em uma vantagem competitiva real.",
   formTitle: "Receba o guia no seu e-mail",
   formSubtitle: "Enviamos o PDF na hora. Sem custo.",
   badges: ["28 páginas", "8 capítulos", "PDF gratuito"],
@@ -174,7 +174,7 @@ export const beneficios = {
   eyebrow: "Capítulo 06",
   title: "Os retornos da prevenção.",
   description:
-    "Muito além da conformidade legal — a NR-1 contribui diretamente para o crescimento sustentável do negócio e para a construção de ambientes mais humanos.",
+    "Adequar-se à NR-1 não é exclusividade de grandes empresas. Negócios de 5 a 100 funcionários que agem agora constroem vantagem competitiva — e evitam multas, processos e afastamentos que podem paralisar a operação.",
   items: [
     {
       numero: "01",
@@ -240,15 +240,15 @@ export const beneficios = {
   fonte: "p.20-21",
 } as const;
 
-/** Cap. 02 — "Quem sou eu" (p.4-5) */
+/** Cap. 02 — "Quem sou eu" (p.4-5) + falas autênticas do podcast */
 export const sobre = {
   eyebrow: "Quem escreveu",
   title: "Gabriela Moreira",
   role: "Consultora · Especialista NR-1",
   paragrafos: [
-    "Enfermeira, mestre em processos interdisciplinares em saúde, especialista em NR-1, além de consultora empresarial apaixonada por desenvolver ambientes de trabalho mais saudáveis, produtivos e sustentáveis.",
-    "Atuo diretamente com saúde corporativa, qualidade de vida e gestão de riscos psicossociais. Auxilio empresas na implementação das exigências da readequação da NR-1, transformando obrigações legais em estratégias que geram resultados para o negócio e para as pessoas.",
-    "Minha trajetória foi construída unindo conhecimento técnico, visão estratégica e profunda compreensão do comportamento humano — apoiando empresários, gestores e equipes na construção de culturas organizacionais mais fortes.",
+    "Enfermeira, mestre em processos interdisciplinares em saúde e especialista em NR-1. Meu trabalho é estar dentro das empresas — ao lado dos gestores e das equipes — identificando riscos reais e construindo ambientes onde as pessoas possam, de fato, ser saudáveis e produtivas.",
+    "Acredito que a gente perde muito tempo falando de doenças, quando poderia estar construindo saúde. Por isso, transformo a NR-1 — que muitos enxergam só como obrigação legal — em uma estratégia que gera resultado para o negócio e qualidade de vida para as pessoas.",
+    "Minha trajetória foi construída unindo conhecimento técnico, visão estratégica e uma profunda compreensão do comportamento humano. Porque, no fim, toda empresa é feita de gente.",
   ],
   areasEyebrow: "Áreas de atuação",
   areas: [
@@ -263,10 +263,10 @@ export const sobre = {
     "Gestão estratégica de pessoas",
     "Consultoria empresarial",
   ],
-  fonte: "p.4-5",
+  fonte: "p.4-5 + Pod com a Gabi EP02",
 } as const;
 
-/** Quote de abertura do ebook (p.3) */
+/** Quote principal da landing — fala diretamente com o gestor/decisor */
 export const quote = {
   texto:
     "Cuidar das pessoas não é custo. É estratégia, produtividade e crescimento sustentável.",
@@ -308,6 +308,18 @@ export const faq = {
       fonte: "p.13",
     },
     {
+      pergunta: "Minha empresa é pequena, a NR-1 se aplica a mim?",
+      resposta:
+        "Sim. A NR-1 se aplica a empresas de todos os portes, inclusive pequenas e médias. Na prática, empresas de 5 a 100 funcionários são as que mais sofrem com autuações — justamente por não terem RH estruturado ou assessoria jurídica. Este guia foi criado exatamente para esse perfil.",
+      fonte: "estrutural",
+    },
+    {
+      pergunta: "Quais são as multas por descumprimento?",
+      resposta:
+        "Empresas que não cumprirem as exigências da NR-1 estão sujeitas a multas administrativas, autuações do Ministério do Trabalho e passivos trabalhistas. A conformidade com o GRO e o PGR é obrigatória e pode ser exigida a qualquer momento em uma fiscalização.",
+      fonte: "estrutural",
+    },
+    {
       pergunta: "O e-book é gratuito mesmo?",
       resposta:
         "Sim. São 28 páginas, 8 capítulos, em PDF. Você recebe o arquivo por e-mail e também pode baixar na hora, logo após preencher o formulário.",
@@ -316,16 +328,16 @@ export const faq = {
   ],
 } as const;
 
-/** Cap. 08 — fechamento (p.27-28) */
+/** Cap. 08 — fechamento (p.27-28) + fala do podcast */
 export const ctaFinal = {
   eyebrow: "Vamos conversar?",
   title:
-    "Para palestras, treinamentos e implementação da NR-1 na sua organização.",
+    "Atendo empresas de pequeno e médio porte que querem se regularizar sem burocracia.",
   quote:
-    "A NR-1 não fala apenas sobre gestão de riscos. Ela fala sobre responsabilidade, cuidado e a construção de ambientes onde pessoas e organizações possam crescer juntas — de forma saudável, segura e sustentável.",
+    "Você está vivendo ou sobrevivendo? Enquanto a gente continuar querendo dar conta de tudo, a gente vai adoecer cada vez mais. Posso te ajudar a mudar isso.",
   autor: "Gabriela Moreira",
   botao: "Falar no WhatsApp",
-  fonte: "p.27-28",
+  fonte: "Pod com a Gabi EP06 + p.27-28",
 } as const;
 
 /** Pagina /obrigado */
