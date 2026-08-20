@@ -23,12 +23,7 @@ export const site = {
   url: SITE_URL,
   locale: "pt-BR",
 
-  /** [PLACEHOLDER] confirmar e-mail oficial */
-  email: "[PLACEHOLDER: e-mail de contato]",
-  /** [PLACEHOLDER] confirmar CNPJ */
-  cnpj: "[PLACEHOLDER: CNPJ]",
-  /** [PLACEHOLDER] confirmar cidade — DDD 13 sugere Baixada Santista/SP */
-  city: "[PLACEHOLDER: Cidade, UF]",
+  email: "",
 
   whatsapp: {
     /** Somente digitos, com DDI. Confirmado via Linktree da Gabi. */
@@ -37,11 +32,9 @@ export const site = {
   },
 
   social: {
-    /** [PLACEHOLDER] confirmar qual perfil e o oficial */
     instagram: "https://www.instagram.com/gabimpl/",
     instagramHandle: "@gabimpl",
     youtube: "https://www.youtube.com/@gabimoreira.nr1",
-    /** [PLACEHOLDER] URL do LinkedIn */
     linkedin: "",
   },
 

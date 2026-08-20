@@ -2,7 +2,6 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 
@@ -116,8 +115,9 @@ export async function POST(request: Request) {
     }
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM;
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const brevoSenderEmail = process.env.BREVO_SENDER_EMAIL;
+  const brevoSenderName = process.env.BREVO_SENDER_NAME;
   const downloadUrl = `${site.url}${site.ebook.file}`;
 
   const evoUrl = process.env.EVOLUTION_API_URL;
@@ -141,9 +141,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           number: number,
           options: { delay: 1200, presence: "composing" },
-          textMessage: {
-            text: `Olá ${nome.split(" ")[0]}, tudo bem? Seu guia da NR-1 está pronto! 🎉\n\nAcesse o link abaixo para baixar o material e começar a aplicar na sua empresa:\n\n${downloadUrl}\n\nQualquer dúvida sobre a implementação na sua empresa, é só responder por aqui.`,
-          }
+          text: `Olá ${nome.split(" ")[0]}, tudo bem? Seu guia da NR-1 está pronto! 🎉\n\nAcesse o link abaixo para baixar o material e começar a aplicar na sua empresa:\n\n${downloadUrl}\n\nQualquer dúvida sobre a implementação na sua empresa, é só responder por aqui.`,
         })
       });
 
@@ -157,8 +155,8 @@ export async function POST(request: Request) {
 
   // Sem chave configurada o site nao quebra: o lead e registrado e o visitante
   // segue para /obrigado, onde baixa o PDF direto.
-  if (!apiKey || !from) {
-    console.warn("[lead] RESEND_API_KEY/RESEND_FROM ausentes — e-mail nao enviado.", {
+  if (!brevoApiKey || !brevoSenderEmail) {
+    console.warn("[lead] BREVO_API_KEY/BREVO_SENDER_EMAIL ausentes — e-mail nao enviado.", {
       nome,
       email,
       telefone,
@@ -168,46 +166,76 @@ export async function POST(request: Request) {
   }
 
   try {
-    const resend = new Resend(apiKey);
+    let attachmentBase64 = "";
+    if (ATTACH_PDF) {
+      const fileBuffer = await readFile(path.join(process.cwd(), "public", "ebook", "nr1-na-pratica.pdf"));
+      attachmentBase64 = fileBuffer.toString("base64");
+    }
 
-    const attachments = ATTACH_PDF
-      ? [
-          {
-            filename: site.ebook.downloadAs,
-            content: (
-              await readFile(path.join(process.cwd(), "public", "ebook", "nr1-na-pratica.pdf"))
-            ).toString("base64"),
-          },
-        ]
-      : undefined;
+    type BrevoPayload = {
+      sender: { name: string; email: string };
+      to: Array<{ email: string; name: string }>;
+      subject: string;
+      htmlContent: string;
+      replyTo?: { email: string };
+      attachment?: Array<{ content: string; name: string }>;
+    };
 
-    const { error } = await resend.emails.send({
-      from,
-      to: email,
-      replyTo: site.email.startsWith("[") ? undefined : site.email,
+    const emailPayload: BrevoPayload = {
+      sender: { name: brevoSenderName || "Vita Saúde", email: brevoSenderEmail },
+      to: [{ email, name: nome }],
       subject: `${site.ebook.title} — seu guia chegou`,
-      html: emailHtml(nome, downloadUrl),
-      attachments,
+      htmlContent: emailHtml(nome, downloadUrl),
+    };
+
+    const siteEmail = site.email as string;
+    if (siteEmail && !siteEmail.startsWith("[")) {
+      emailPayload.replyTo = { email: siteEmail };
+    }
+
+    if (attachmentBase64) {
+      emailPayload.attachment = [{
+        content: attachmentBase64,
+        name: site.ebook.downloadAs
+      }];
+    }
+
+    const emailReq = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": brevoApiKey,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(emailPayload)
     });
 
-    if (error) {
-      console.error("[lead] Resend recusou o envio:", error);
+    if (!emailReq.ok) {
+      console.error("[lead] Brevo recusou o envio:", await emailReq.text());
       return NextResponse.json({ ok: true, emailSent: false });
     }
 
     const notify = process.env.LEAD_NOTIFICATION_TO;
     if (notify) {
-      await resend.emails.send({
-        from,
-        to: notify,
-        subject: `Novo lead: ${nome} — ${empresa}`,
-        text: `Nome: ${nome}\nE-mail: ${email}\nTelefone: ${telefone}\nEmpresa: ${empresa}\nOrigem: landing do e-book`,
+      await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": brevoApiKey,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          sender: { name: brevoSenderName || "Vita Saúde", email: brevoSenderEmail },
+          to: [{ email: notify }],
+          subject: `Novo lead: ${nome} — ${empresa}`,
+          textContent: `Nome: ${nome}\nE-mail: ${email}\nTelefone: ${telefone}\nEmpresa: ${empresa}\nOrigem: landing do e-book`
+        })
       });
     }
 
     return NextResponse.json({ ok: true, emailSent: true });
   } catch (error) {
-    console.error("[lead] Falha inesperada no envio:", error);
+    console.error("[lead] Falha inesperada no envio de email:", error);
     // O visitante nao pode ficar sem o material por causa de erro nosso.
     return NextResponse.json({ ok: true, emailSent: false });
   }

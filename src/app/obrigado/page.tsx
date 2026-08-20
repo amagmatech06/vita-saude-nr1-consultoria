@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { redirect } from "next/navigation";
+
 import { BlurFade } from "@/components/BlurFade";
 import { WhatsappIcon } from "@/components/icons";
 import { WhatsappLink } from "@/components/layout/WhatsappLink";
@@ -15,7 +17,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function ObrigadoPage() {
+export default async function ObrigadoPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const params = await searchParams;
+  if (params.ref !== "form") {
+    redirect("/");
+  }
+
   return (
     <>
       <PageHero
@@ -46,14 +53,14 @@ export default function ObrigadoPage() {
 
       <SectionContainer bg="white">
         <BlurFade>
-          <figure className="flex max-w-[26ch] flex-col gap-6">
+          <figure className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
             <blockquote
               className="font-serif text-[1.5rem] leading-[1.35] tracking-[-0.02em] md:text-[2rem]"
               style={{ color: "#070A26" }}
             >
               {obrigado.fecho}
             </blockquote>
-            <figcaption className="flex items-center gap-4">
+            <figcaption className="flex items-center justify-center gap-4">
               <span aria-hidden className="h-px w-10" style={{ background: "rgba(7, 10, 38, 0.3)" }} />
               <span
                 className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
@@ -61,6 +68,7 @@ export default function ObrigadoPage() {
               >
                 {site.founder.name} · {site.ebook.title}
               </span>
+              <span aria-hidden className="h-px w-10" style={{ background: "rgba(7, 10, 38, 0.3)" }} />
             </figcaption>
           </figure>
         </BlurFade>

@@ -86,7 +86,7 @@ export function LeadForm() {
       }
 
       track("lead_submit", { empresa: values.empresa });
-      router.push("/obrigado");
+      router.push("/obrigado?ref=form");
     } catch {
       track("lead_error", { status: 0 });
       setServerError("Sem conexão com o servidor. Tente novamente.");

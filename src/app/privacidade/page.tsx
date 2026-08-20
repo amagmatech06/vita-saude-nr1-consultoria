@@ -14,8 +14,7 @@ export const metadata: Metadata = {
 /**
  * [REVISAR JURIDICAMENTE] Texto-base de conformidade com a LGPD
  * (Lei 13.709/2018), escrito para o unico tratamento que o site faz hoje:
- * o formulario de download do e-book. Deve ser revisado por advogado antes
- * do lancamento, e os [PLACEHOLDER] precisam ser preenchidos.
+ * o formulario de download do e-book.
  */
 export default function PrivacidadePage() {
   return (
@@ -41,8 +40,7 @@ export default function PrivacidadePage() {
 
           <h2>1. Quem é o controlador</h2>
           <p>
-            {site.name} ({site.cnpj}), com contato em {site.email}
-            {" "}e WhatsApp {site.whatsapp.display}, é a controladora dos dados tratados aqui.
+            {site.name}, com contato pelo WhatsApp {site.whatsapp.display}, é a controladora dos dados tratados aqui.
           </p>
 
           <h2>2. Quais dados coletamos</h2>
@@ -73,7 +71,7 @@ export default function PrivacidadePage() {
           <p>
             Não vendemos nem cedemos seus dados. Eles são processados apenas por fornecedores
             necessários para a operação do site: <strong>Vercel</strong> (hospedagem) e{" "}
-            <strong>Resend</strong> (envio de e-mail).
+            <strong>Brevo</strong> (envio de e-mail).
           </p>
 
           <h2>6. Por quanto tempo guardamos</h2>
@@ -86,7 +84,7 @@ export default function PrivacidadePage() {
           <p>
             A LGPD garante a você confirmar a existência do tratamento, acessar, corrigir,
             anonimizar, portar ou eliminar seus dados, além de revogar o consentimento a
-            qualquer momento. Para exercer qualquer um deles, escreva para {site.email}. O
+            qualquer momento. Para exercer qualquer um deles, entre em contato pelo WhatsApp. O
             cancelamento das comunicações também pode ser feito pelo link no rodapé de cada
             e-mail.
           </p>
@@ -110,7 +108,7 @@ export default function PrivacidadePage() {
           </p>
 
           <p style={{ color: "rgba(7, 10, 38, 0.68)" }}>
-            <em>Última atualização: [PLACEHOLDER: data de publicação]</em>
+            <em>Última atualização: Agosto de 2026</em>
           </p>
         </div>
       </SectionContainer>
