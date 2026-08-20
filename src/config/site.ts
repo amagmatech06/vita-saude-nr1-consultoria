@@ -23,7 +23,7 @@ export const site = {
   url: SITE_URL,
   locale: "pt-BR",
 
-  email: "",
+  email: "[EMAIL_ADDRESS]",
 
   whatsapp: {
     /** Somente digitos, com DDI. Confirmado via Linktree da Gabi. */
