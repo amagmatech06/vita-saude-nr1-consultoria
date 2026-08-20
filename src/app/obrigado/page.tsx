@@ -13,8 +13,12 @@ import { site } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Seu guia está a caminho",
-  description: "Download do e-book NR-1 na Prática.",
+  description:
+    "Baixe o e-book NR-1 na Prática: 28 páginas sobre gestão de riscos psicossociais, GRO e PGR.",
+  // Pagina de conversao: fora do indice e sem canonical proprio. O importante e
+  // NAO herdar o canonical da home, que a declarava como duplicata dela.
   robots: { index: false, follow: false },
+  alternates: { canonical: "/obrigado" },
 };
 
 export default async function ObrigadoPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
@@ -63,7 +67,7 @@ export default async function ObrigadoPage({ searchParams }: { searchParams: Pro
             <figcaption className="flex items-center justify-center gap-4">
               <span aria-hidden className="h-px w-10" style={{ background: "rgba(7, 10, 38, 0.3)" }} />
               <span
-                className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
                 style={{ color: "rgba(7, 10, 38, 0.68)" }}
               >
                 {site.founder.name} · {site.ebook.title}
