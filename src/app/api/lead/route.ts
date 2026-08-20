@@ -16,6 +16,14 @@ export const runtime = "nodejs";
  */
 const ATTACH_PDF = process.env.EMAIL_ATTACH_PDF !== "false";
 
+/**
+ * Nenhum fetch daqui tinha timeout, e o Node/undici nao impoe um. Uma instancia
+ * da Evolution pendurada travava a request ate o limite da funcao na Vercel —
+ * e como o WhatsApp roda ANTES da Brevo, o e-mail nem chegava a ser tentado.
+ */
+const TIMEOUT_MS = 8000;
+const comTimeout = () => AbortSignal.timeout(TIMEOUT_MS);
+
 const leadSchema = z.object({
   nome: z.string().trim().min(2, "Informe seu nome.").max(80),
   email: z.email("E-mail inválido.").max(160),
@@ -73,6 +81,51 @@ function emailHtml(nome: string, downloadUrl: string) {
 </body></html>`;
 }
 
+type Lead = { nome: string; email: string; telefone: string; empresa: string };
+
+/**
+ * Alerta interno. Antes vivia DEPOIS do `return` do erro da Brevo, entao so
+ * disparava no caminho feliz — exatamente quando nao era necessario. Agora roda
+ * em todos os caminhos, e `alerta` diz o que deu errado.
+ */
+async function notificarLead(lead: Lead, alerta?: string) {
+  const notify = process.env.LEAD_NOTIFICATION_TO;
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL;
+  if (!notify || !apiKey || !senderEmail) return;
+
+  const linhas = [
+    `Nome: ${lead.nome}`,
+    `E-mail: ${lead.email}`,
+    `Telefone: ${lead.telefone}`,
+    `Empresa: ${lead.empresa}`,
+    "Origem: landing do e-book",
+    ...(alerta ? ["", `*** ${alerta} — registre este lead manualmente. ***`] : []),
+  ];
+
+  try {
+    await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": apiKey,
+        "content-type": "application/json"
+      },
+      signal: comTimeout(),
+      body: JSON.stringify({
+        sender: { name: process.env.BREVO_SENDER_NAME || "Vita Saúde", email: senderEmail },
+        to: [{ email: notify }],
+        subject: alerta
+          ? `[ATENCAO] Lead: ${lead.nome} — ${lead.empresa}`
+          : `Novo lead: ${lead.nome} — ${lead.empresa}`,
+        textContent: linhas.join("\n")
+      })
+    });
+  } catch (e) {
+    console.error("[lead] Falha ao notificar internamente:", e);
+  }
+}
+
 export async function POST(request: Request) {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -104,15 +157,26 @@ export async function POST(request: Request) {
   // Honeypot preenchido: responde 200 para nao dar pista ao bot.
   if (website) return NextResponse.json({ ok: true });
 
+  const lead: Lead = { nome, email, telefone, empresa };
+
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  /** O lead so esta seguro se chegou ao banco. Usado para decidir o alerta abaixo. */
+  let leadPersistido = false;
 
   if (supabaseUrl && supabaseKey) {
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { error: dbError } = await supabase.from('leads').insert([{ nome, email, telefone, empresa }]);
     if (dbError) {
       console.error("[lead] Falha ao inserir no Supabase:", dbError);
+    } else {
+      leadPersistido = true;
     }
+  } else {
+    // Antes este caminho era mudo: sem as envs, o insert era pulado e ninguem
+    // ficava sabendo que o lead nao foi gravado em lugar nenhum.
+    console.error("[lead] SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY ausentes — lead NAO persistido.");
   }
 
   const brevoApiKey = process.env.BREVO_API_KEY;
@@ -138,6 +202,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
           "apikey": evoKey,
         },
+        signal: comTimeout(),
         body: JSON.stringify({
           number: number,
           options: { delay: 1200, presence: "composing" },
@@ -156,11 +221,9 @@ export async function POST(request: Request) {
   // Sem chave configurada o site nao quebra: o lead e registrado e o visitante
   // segue para /obrigado, onde baixa o PDF direto.
   if (!brevoApiKey || !brevoSenderEmail) {
-    console.warn("[lead] BREVO_API_KEY/BREVO_SENDER_EMAIL ausentes — e-mail nao enviado.", {
-      nome,
-      email,
-      telefone,
-      empresa,
+    // Sem PII no log: nome/e-mail/telefone iam parar nos logs da Vercel.
+    console.error("[lead] BREVO_API_KEY/BREVO_SENDER_EMAIL ausentes — e-mail nao enviado.", {
+      persistido: leadPersistido,
     });
     return NextResponse.json({ ok: true, emailSent: false });
   }
@@ -207,35 +270,25 @@ export async function POST(request: Request) {
         "api-key": brevoApiKey,
         "content-type": "application/json"
       },
-      body: JSON.stringify(emailPayload)
+      body: JSON.stringify(emailPayload),
+      signal: comTimeout()
     });
 
     if (!emailReq.ok) {
       console.error("[lead] Brevo recusou o envio:", await emailReq.text());
+      await notificarLead(
+        lead,
+        leadPersistido ? "E-mail nao entregue" : "E-mail NAO enviado e lead NAO gravado no banco",
+      );
       return NextResponse.json({ ok: true, emailSent: false });
     }
 
-    const notify = process.env.LEAD_NOTIFICATION_TO;
-    if (notify) {
-      await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          "accept": "application/json",
-          "api-key": brevoApiKey,
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          sender: { name: brevoSenderName || "Vita Saúde", email: brevoSenderEmail },
-          to: [{ email: notify }],
-          subject: `Novo lead: ${nome} — ${empresa}`,
-          textContent: `Nome: ${nome}\nE-mail: ${email}\nTelefone: ${telefone}\nEmpresa: ${empresa}\nOrigem: landing do e-book`
-        })
-      });
-    }
+    await notificarLead(lead, leadPersistido ? undefined : "Lead NAO gravado no banco");
 
     return NextResponse.json({ ok: true, emailSent: true });
   } catch (error) {
     console.error("[lead] Falha inesperada no envio de email:", error);
+    await notificarLead(lead, "Falha inesperada no envio");
     // O visitante nao pode ficar sem o material por causa de erro nosso.
     return NextResponse.json({ ok: true, emailSent: false });
   }
