@@ -3,8 +3,9 @@
 Página de captura do e-book gratuito **NR-1 na Prática — O Guia Completo para
 Gestão de Riscos Psicossociais nas Empresas**, de Gabriela Moreira.
 
-O visitante preenche nome, e-mail e empresa; recebe o PDF por e-mail e também
-pode baixar na hora em `/obrigado`.
+O visitante preenche nome, e-mail, telefone/WhatsApp e empresa; o lead é gravado
+no Supabase, recebe o PDF por e-mail (Brevo) e o link por WhatsApp (Evolution
+API), e também pode baixar na hora em `/obrigado`.
 
 ---
 
@@ -16,10 +17,12 @@ pode baixar na hora em `/obrigado`.
 | Linguagem | TypeScript **strict** (zero `any`) |
 | UI | React 19 |
 | Estilo | Tailwind v4 (config CSS-first via `@theme`) + `@tailwindcss/typography` |
-| Conteúdo | Velite (MDX tipado) — configurado, coleções vazias até a Fase 2 |
+| Conteúdo | Velite (MDX tipado) — configurado, **coleções ainda vazias**; nenhuma rota consome |
 | Animação | Framer Motion (`BlurFade`) |
 | Formulário | react-hook-form (cliente) + zod (servidor) |
-| E-mail | Resend |
+| E-mail | Brevo |
+| Banco | Supabase |
+| WhatsApp | Evolution API |
 | Fontes | Inter + Playfair Display, via `next/font/google` |
 | Deploy | Vercel |
 
@@ -47,18 +50,20 @@ npm run dev                    # http://localhost:3000
 | Variável | Obrigatória | Para quê |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | sim (produção) | URL canônica: metadata, sitemap, robots, link do PDF no e-mail |
-| `RESEND_API_KEY` | para enviar e-mail | Chave em <https://resend.com/api-keys> |
-| `RESEND_FROM` | para enviar e-mail | Ex.: `Vita Saúde <contato@seudominio.com.br>` |
+| `BREVO_API_KEY` | para enviar e-mail | Chave em <https://app.brevo.com/settings/keys/api> |
+| `BREVO_SENDER_EMAIL` | para enviar e-mail | Remetente; precisa de domínio verificado na Brevo |
+| `BREVO_SENDER_NAME` | não | Nome exibido no remetente |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | sim | Onde o lead é persistido |
+| `EVOLUTION_API_URL` / `_KEY` / `_INSTANCE` | não | Envio automático por WhatsApp |
+| `NEXT_PUBLIC_GTM_ID` | não | Sem ele os eventos de conversão não são coletados |
 | `LEAD_NOTIFICATION_TO` | não | Recebe uma cópia de cada lead novo |
 | `EMAIL_ATTACH_PDF` | não | `false` desliga o anexo e envia só o link (ver nota abaixo) |
 
-> **Sem `RESEND_API_KEY` o site não quebra.** O lead é registrado no log do
-> servidor, o visitante segue para `/obrigado` e baixa o PDF direto. Só o
-> e-mail deixa de sair.
+> **Sem `BREVO_API_KEY` o site não quebra**, mas o e-mail não sai. Se
+> `LEAD_NOTIFICATION_TO` estiver configurado, a falha gera um alerta interno
+> marcado `[ATENCAO]` — é o único aviso de que um lead pode ter se perdido.
 
-> **O remetente precisa de domínio verificado no Resend.** Sem isso, use
-> `onboarding@resend.dev`, que só entrega no e-mail dono da conta Resend —
-> serve para testar, não para produção.
+> **O remetente precisa de domínio verificado na Brevo** para produção.
 
 ---
 
@@ -77,11 +82,13 @@ alterar, mantenha essa disciplina.
 ### Dados da marca
 
 [`src/config/site.ts`](src/config/site.ts): nome, tagline, WhatsApp, redes,
-e-mail, CNPJ, cidade e os metadados do e-book.
+e-mail, dados jurídicos (`site.legal`) e os metadados do e-book.
 
-Os itens ainda marcados com `[PLACEHOLDER: ...]` precisam ser preenchidos:
-e-mail, CNPJ, cidade/UF, LinkedIn, e a confirmação de qual Instagram é o
-oficial.
+Já preenchido: **CNPJ 41.720.857/0001-63**.
+
+Ainda `[PENDENTE]`: razão social, endereço (cidade/UF), e-mail institucional
+(depende do registro do domínio no registro.br), LinkedIn, registro COREN da
+fundadora e o nome do encarregado de dados.
 
 ### Trocar o PDF do e-book
 
@@ -143,7 +150,7 @@ Um lugar só: o bloco `@theme` em
 
 ```css
 @theme {
-  --color-petroleo: #252534;   /* escura profunda: texto, navbar, footer */
+  --color-petroleo: #070A26;   /* escura profunda: texto, navbar, footer */
   --color-indigo:   #4544BD;   /* principal escura: heros, seções de destaque */
   --color-gema:     #FEC717;   /* ACENTO RARO — máx. 2 usos por página */
   --color-neutra:   #F1F1F1;   /* seções alternadas claras */
@@ -172,7 +179,7 @@ Todas as cores foram extraídas por amostragem de pixel do próprio e-book.
 | Componente | Papel |
 |---|---|
 | `SectionContainer` | Wrapper de seção. Variantes de fundo `white \| neutra \| indigo \| petroleo`, grid opcional, larguras `narrow \| default \| wide` |
-| `SectionEyebrow` | Sobretítulo 11px, tracking 2px, underline sólido de 16px |
+| `SectionEyebrow` | Sobretítulo 12px, tracking 2px, underline sólido de 16px |
 | `SectionHeading` | Eyebrow + título + descrição, com ênfase em uma palavra-chave |
 | `PageHero` | Hero de página. Variantes `full \| compact \| minimal` |
 | `NumberedList` | Lista 01/02/… com miniatura opcional |
@@ -228,7 +235,8 @@ Eventos: `whatsapp_click` (com `source`), `ebook_download`, `lead_submit`,
 
 ## Conformidade
 
-- `/privacidade` cobre o único tratamento de dados do site (o formulário).
-  **O texto é uma base e precisa de revisão jurídica antes do lançamento**;
-  a data de publicação está como `[PLACEHOLDER]`.
-- `/obrigado` é `noindex`, e `robots.ts` bloqueia `/obrigado` e `/api/`.
+- `/privacidade` cobre o tratamento de dados do formulário, identifica a
+  controladora pelo CNPJ e declara a transferência internacional.
+  **O texto continua precisando de revisão jurídica antes do lançamento.**
+- `/obrigado` é `noindex`. O `robots.ts` bloqueia `/api/lead` e `/ebook/` —
+  **não** bloqueia `/api/og`, que é a imagem dos cards sociais.

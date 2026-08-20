@@ -12,7 +12,7 @@ const BORDER = "rgba(249, 249, 251, 0.12)";
 function ColumnTitle({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="mb-5 text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+      className="mb-5 text-[0.75rem] font-bold uppercase tracking-[0.14em]"
       style={{ color: "rgba(249, 249, 251, 0.62)" }}
     >
       {children}
@@ -33,7 +33,7 @@ export function Footer() {
 
   return (
     <footer
-      className="relative isolate overflow-hidden"
+      className="relative isolate overflow-clip"
       style={{ background: "#070A26", color: LIGHT_STRONG }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci" />
@@ -54,7 +54,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-white/10"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors hover:bg-white/10"
                   style={{ borderColor: BORDER, color: LIGHT }}
                 >
                   <Icon className="h-[18px] w-[18px]" />
@@ -68,9 +68,9 @@ export function Footer() {
             <ColumnTitle>Produtos</ColumnTitle>
             <ul className="flex flex-col gap-3" style={{ color: LIGHT }}>
               <li>
-                <a href="#baixar" className={linkClass}>
+                <Link href="/#baixar" className={linkClass}>
                   E-book NR-1 na Prática
-                </a>
+                </Link>
               </li>
               <li>
                 <WhatsappLink
@@ -98,19 +98,19 @@ export function Footer() {
             <ColumnTitle>Conteúdo</ColumnTitle>
             <ul className="flex flex-col gap-3" style={{ color: LIGHT }}>
               <li>
-                <a href="#o-guia" className={linkClass}>
+                <Link href="/#o-guia" className={linkClass}>
                   O que há no guia
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#autora" className={linkClass}>
+                <Link href="/#autora" className={linkClass}>
                   Sobre a autora
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#faq" className={linkClass}>
+                <Link href="/#faq" className={linkClass}>
                   Perguntas frequentes
-                </a>
+                </Link>
               </li>
               <li>
                 <a
@@ -143,8 +143,12 @@ export function Footer() {
           className="mt-14 flex flex-col gap-4 border-t pt-8 text-[0.8125rem] md:flex-row md:items-center md:justify-between"
           style={{ borderColor: BORDER, color: "rgba(249, 249, 251, 0.62)" }}
         >
+          {/* Identificacao juridica visivel: o que separa fornecedor B2B de blog. */}
           <p>
             © {new Date().getFullYear()} {site.name}
+            {site.legal.razaoSocial ? ` · ${site.legal.razaoSocial}` : ""} · CNPJ{" "}
+            {site.legal.cnpj}
+            {site.legal.endereco ? ` · ${site.legal.endereco}` : ""}
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacidade" className="transition-colors hover:text-[#F9F9FB]">

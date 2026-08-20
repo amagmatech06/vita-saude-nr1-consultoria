@@ -23,6 +23,23 @@ export const site = {
   url: SITE_URL,
   locale: "pt-BR",
 
+  /**
+   * Identificacao juridica da controladora. Exigida pela LGPD (o controlador
+   * precisa ser identificavel) e usada no `taxID` do JSON-LD de Organization.
+   */
+  legal: {
+    cnpj: "41.720.857/0001-63",
+    /** [PENDENTE] Razao social exata do cartao CNPJ. */
+    razaoSocial: "",
+    /** [PENDENTE] Cidade/UF da sede — o DDI/DDD sugere Baixada Santista/SP. */
+    endereco: "",
+  },
+
+  /**
+   * [PENDENTE] So existira depois do registro do dominio no registro.br.
+   * Consumido em `api/lead` (replyTo) e no rodape, ambos com guarda: enquanto
+   * comecar com "[", nada e renderizado nem enviado.
+   */
   email: "[EMAIL_ADDRESS]",
 
   whatsapp: {
