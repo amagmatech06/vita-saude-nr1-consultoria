@@ -6,10 +6,16 @@ import { faq } from "@/config/ebook-content";
 
 export function FaqSection() {
   return (
-    <SectionContainer bg="neutra" id="faq" innerClassName="scroll-mt-20">
+    <SectionContainer bg="neutra" id="faq" labelledBy="faq-titulo">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
         <BlurFade className="lg:sticky lg:top-28 lg:self-start">
-          <SectionHeading eyebrow={faq.eyebrow} title={faq.title} accent="baixar" size="sm" />
+          <SectionHeading
+            eyebrow={faq.eyebrow}
+            title={faq.title}
+            accent="baixar"
+            size="sm"
+            titleId="faq-titulo"
+          />
         </BlurFade>
 
         <BlurFade index={1}>
@@ -20,7 +26,7 @@ export function FaqSection() {
                 className="group border-t"
                 style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}
               >
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 transition-opacity duration-200 hover:opacity-70 [&::-webkit-details-marker]:hidden">
                   <h3
                     className="font-serif text-[1.125rem] font-bold leading-[1.35] md:text-[1.25rem]"
                     style={{ color: "#070A26" }}

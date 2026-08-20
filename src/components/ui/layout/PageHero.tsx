@@ -61,8 +61,9 @@ export function PageHero({
 
   return (
     <section
+      aria-labelledby="pagehero-titulo"
       style={{ background: "#070A26", color: "#F9F9FB" }}
-      className={cn("relative isolate overflow-hidden", className)}
+      className={cn("relative isolate overflow-clip", className)}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci-fade" />
       <div
@@ -90,6 +91,7 @@ export function PageHero({
             {eyebrow ? <SectionEyebrow tone="light">{eyebrow}</SectionEyebrow> : null}
 
             <h1
+              id="pagehero-titulo"
               className={cn("max-w-[18ch] tracking-[-0.025em]", TITLE_SIZE[variant])}
               style={{ color: "#F9F9FB" }}
             >

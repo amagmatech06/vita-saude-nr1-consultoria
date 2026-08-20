@@ -18,7 +18,7 @@ export function QuoteSection() {
   const parts = split(quote.texto, quote.accent);
 
   return (
-    <SectionContainer bg="petroleo" grid width="narrow">
+    <SectionContainer bg="petroleo" grid width="narrow" ariaLabel="Citação da autora">
       <BlurFade>
         <figure className="flex flex-col gap-8">
           <svg

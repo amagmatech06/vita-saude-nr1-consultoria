@@ -8,7 +8,7 @@ import { sobre } from "@/config/ebook-content";
 
 export function SobreSection() {
   return (
-    <SectionContainer bg="white" id="autora" innerClassName="scroll-mt-20">
+    <SectionContainer bg="white" id="autora" labelledBy="autora-titulo">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-16">
         <BlurFade>
           <div className="relative">
@@ -24,9 +24,19 @@ export function SobreSection() {
               className="mt-5 border-l-2 pl-5"
               style={{ borderColor: "#4544BD" }}
             >
-              <p className="font-serif text-[1.375rem] font-bold" style={{ color: "#070A26" }}>
+              {/*
+                h2, nao <p>: a secao #autora era a unica da pagina sem heading
+                nenhum. Sem ela, o link "A autora" levava a uma regiao anonima e
+                o unico sinal de autoridade da pagina sumia da navegacao por
+                headings e do crawler.
+              */}
+              <h2
+                id="autora-titulo"
+                className="font-serif text-[1.375rem] font-bold"
+                style={{ color: "#070A26" }}
+              >
                 {sobre.title}
-              </p>
+              </h2>
               <p className="text-[0.9375rem]" style={{ color: "rgba(7, 10, 38, 0.68)" }}>
                 {sobre.role}
               </p>
@@ -53,7 +63,7 @@ export function SobreSection() {
           <BlurFade index={2}>
             <div className="border-t pt-8" style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}>
               <p
-                className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
                 style={{ color: "rgba(7, 10, 38, 0.68)" }}
               >
                 {sobre.areasEyebrow}

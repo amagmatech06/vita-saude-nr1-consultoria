@@ -5,11 +5,12 @@ import { beneficios } from "@/config/ebook-content";
 
 export function BeneficiosSection() {
   return (
-    <SectionContainer bg="neutra" id="beneficios">
+    <SectionContainer bg="neutra" id="beneficios" labelledBy="beneficios-titulo">
       <BlurFade>
         <SectionHeading
           eyebrow={beneficios.eyebrow}
           title={beneficios.title}
+          titleId="beneficios-titulo"
           accent="prevenção"
           description={beneficios.description}
         />

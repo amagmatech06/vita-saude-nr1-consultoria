@@ -9,11 +9,12 @@ const ICONS = [ShieldIcon, BrainIcon] as const;
 
 export function ProblemaSection() {
   return (
-    <SectionContainer bg="neutra" grid id="problema">
+    <SectionContainer bg="neutra" grid id="problema" labelledBy="problema-titulo">
       <BlurFade>
         <SectionHeading
           eyebrow={problema.eyebrow}
           title={problema.title}
+          titleId="problema-titulo"
           accent="riscos psicossociais"
           description={problema.description}
           size="md"
@@ -37,7 +38,7 @@ export function ProblemaSection() {
               >
                 <div className="flex items-center justify-between gap-4">
                   <p
-                    className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                    className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
                     style={{ color: destaque ? "rgba(249, 249, 251, 0.62)" : "rgba(7, 10, 38, 0.68)" }}
                   >
                     {coluna.eyebrow}
@@ -90,7 +91,7 @@ export function ProblemaSection() {
       <BlurFade index={3}>
         <div className="mt-14 border-t pt-10 text-center sm:text-left" style={{ borderColor: "rgba(7, 10, 38, 0.12)" }}>
           <p
-            className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+            className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
             style={{ color: "rgba(7, 10, 38, 0.68)" }}
           >
             {indicadores.eyebrow}

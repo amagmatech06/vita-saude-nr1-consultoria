@@ -74,6 +74,9 @@ export function CTALink({
         href={href}
         style={variantConfig.style}
         className={classes}
+        // `mailto:` abre o cliente de e-mail — abrir em nova aba deixaria uma
+        // guia orfa. So o http externo vai para nova aba.
+        target={href.startsWith("mailto:") ? undefined : "_blank"}
         rel="noopener noreferrer"
         {...rest}
       >

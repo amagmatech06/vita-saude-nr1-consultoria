@@ -14,12 +14,13 @@ export function CapitulosSection() {
   }));
 
   return (
-    <SectionContainer bg="white" id="o-guia" innerClassName="scroll-mt-20">
+    <SectionContainer bg="white" id="o-guia" labelledBy="o-guia-titulo">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
         <BlurFade className="lg:sticky lg:top-28 lg:self-start">
           <SectionHeading
             eyebrow={capitulos.eyebrow}
             title={capitulos.title}
+            titleId="o-guia-titulo"
             accent="do conceito à execução"
             description={capitulos.description}
             size="md"

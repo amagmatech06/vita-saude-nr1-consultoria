@@ -12,12 +12,13 @@ import { ctaFinal } from "@/config/ebook-content";
  */
 export function CtaFinalSection() {
   return (
-    <SectionContainer bg="indigo" grid id="contato">
+    <SectionContainer bg="indigo" grid id="contato" labelledBy="contato-titulo">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-20">
         <BlurFade>
           <div className="flex flex-col gap-6">
             <SectionEyebrow tone="light">{ctaFinal.eyebrow}</SectionEyebrow>
             <h2
+              id="contato-titulo"
               className="max-w-[20ch] text-[2rem] leading-[1.12] tracking-[-0.025em] md:text-[2.75rem]"
               style={{ color: "#F9F9FB" }}
             >
@@ -54,7 +55,7 @@ export function CtaFinalSection() {
               {ctaFinal.quote}
             </blockquote>
             <figcaption
-              className="mt-6 text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+              className="mt-6 text-[0.75rem] font-bold uppercase tracking-[0.14em]"
               style={{ color: "rgba(249, 249, 251, 0.8)" }}
             >
               {ctaFinal.autor}

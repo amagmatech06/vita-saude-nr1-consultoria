@@ -40,7 +40,7 @@ export function Logo({ tone = "light", className, withFounder = false }: LogoPro
         </span>
         {withFounder ? (
           <span
-            className="mt-1.5 text-[0.6875rem] font-medium uppercase tracking-[0.14em]"
+            className="mt-1.5 text-[0.75rem] font-medium uppercase tracking-[0.14em]"
             style={{ color: subColor }}
           >
             por {site.founder.name}

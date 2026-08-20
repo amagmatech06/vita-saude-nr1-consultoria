@@ -35,6 +35,14 @@ type SectionContainerProps = {
   width?: "default" | "narrow" | "wide";
   as?: ElementType;
   id?: string;
+  /**
+   * `id` do heading que nomeia a secao. Sem nome acessivel, <section> e exposta
+   * como `generic` e nao aparece na navegacao por landmarks do leitor de tela —
+   * eram 8 secoes anonimas na home.
+   */
+  labelledBy?: string;
+  /** Rotulo direto, para secoes que nao tem heading (ex.: a citacao). */
+  ariaLabel?: string;
   className?: string;
   /** Classes do wrapper interno (o que limita a largura). */
   innerClassName?: string;
@@ -54,6 +62,8 @@ export function SectionContainer({
   width = "default",
   as: Tag = "section",
   id,
+  labelledBy,
+  ariaLabel,
   className,
   innerClassName,
 }: SectionContainerProps) {
@@ -68,8 +78,20 @@ export function SectionContainer({
   return (
     <Tag
       id={id}
+      aria-labelledby={labelledBy}
+      aria-label={ariaLabel}
       style={BACKGROUNDS[bg]}
-      className={cn("relative isolate overflow-hidden", className)}
+      className={cn(
+        // `overflow-clip` e nao `overflow-hidden`: o hidden cria um scroll
+        // container e anula o `position: sticky` dos filhos (as colunas
+        // sticky de Capitulos e FAQ). O clip recorta igual sem esse efeito.
+        "relative isolate overflow-clip",
+        // A navbar e fixa (72px). O scroll-margin precisa ficar no MESMO
+        // elemento que carrega o `id` — e o alvo da ancora — senao o topo da
+        // secao fica escondido atras dela.
+        id && "scroll-mt-[88px]",
+        className,
+      )}
     >
       {gridClass ? (
         <div aria-hidden className={cn("pointer-events-none absolute inset-0", gridClass)} />

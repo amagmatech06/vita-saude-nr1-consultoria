@@ -17,7 +17,8 @@ import { LeadForm } from "./LeadForm";
 export function HeroSection() {
   return (
     <section
-      className="relative isolate overflow-hidden"
+      aria-labelledby="hero-titulo"
+      className="relative isolate overflow-clip"
       style={{ background: "#070A26", color: "#F9F9FB" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-perci-fade" />
@@ -37,6 +38,7 @@ export function HeroSection() {
             <SectionEyebrow tone="light">{hero.eyebrow}</SectionEyebrow>
 
             <h1
+              id="hero-titulo"
               className="text-[2.75rem] leading-[1.02] tracking-[-0.03em] sm:text-[3.5rem] lg:text-[4.25rem]"
               style={{ color: "#F9F9FB" }}
             >
@@ -92,7 +94,7 @@ export function HeroSection() {
               />
               <div className="flex flex-col gap-1">
                 <p
-                  className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                  className="text-[0.75rem] font-bold uppercase tracking-[0.14em]"
                   style={{ color: "rgba(249, 249, 251, 0.62)" }}
                 >
                   Por

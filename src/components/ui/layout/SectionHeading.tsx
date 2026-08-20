@@ -21,6 +21,8 @@ type SectionHeadingProps = {
   align?: "left" | "center";
   as?: "h1" | "h2" | "h3";
   size?: "sm" | "md" | "lg";
+  /** `id` do heading, para o `aria-labelledby` da secao que o contem. */
+  titleId?: string;
   className?: string;
 };
 
@@ -52,6 +54,7 @@ export function SectionHeading({
   align = "left",
   as: Tag = "h2",
   size = "md",
+  titleId,
   className,
 }: SectionHeadingProps) {
   const parts = splitOnAccent(title, accent);
@@ -70,6 +73,7 @@ export function SectionHeading({
       {eyebrow ? <SectionEyebrow tone={tone}>{eyebrow}</SectionEyebrow> : null}
 
       <Tag
+        id={titleId}
         className={cn("max-w-[22ch] tracking-[-0.02em]", SIZES[size])}
         style={{ color: titleColor }}
       >

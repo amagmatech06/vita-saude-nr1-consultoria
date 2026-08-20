@@ -20,7 +20,8 @@ type FormValues = {
 
 const INK = "#070A26";
 const MUTED = "rgba(7, 10, 38, 0.68)";
-const BORDER = "rgba(7, 10, 38, 0.16)";
+/** 0.42 sobre branco da ~3,1:1 — a borda e a unica delimitacao do campo. */
+const BORDER = "rgba(7, 10, 38, 0.42)";
 const DANGER = "#B42318";
 
 function Field({
@@ -31,9 +32,12 @@ function Field({
 }: {
   label: string;
   error?: string;
-  children: React.ReactNode;
+  /** Recebe o `id` da mensagem de erro para ligar ao input via aria-describedby. */
+  children: (erroId: string | undefined) => React.ReactNode;
   htmlFor: string;
 }) {
+  const erroId = `${htmlFor}-erro`;
+
   return (
     <div className="flex flex-col gap-1.5">
       <label
@@ -43,9 +47,9 @@ function Field({
       >
         {label}
       </label>
-      {children}
+      {children(error ? erroId : undefined)}
       {error ? (
-        <p role="alert" className="text-[0.8125rem]" style={{ color: DANGER }}>
+        <p id={erroId} role="alert" className="text-[0.8125rem]" style={{ color: DANGER }}>
           {error}
         </p>
       ) : null}
@@ -61,13 +65,20 @@ export function LeadForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: { nome: "", email: "", telefone: "", empresa: "", consent: false, website: "" },
   });
 
+  /**
+   * A utility que zera o outline nao entra aqui: ela fica na layer `utilities`, que vence o
+   * `:focus-visible` do globals.css (layer `base`) — o campo ficaria sem
+   * NENHUM indicador de foco. A borda tambem nao serve de indicador aqui,
+   * porque o `style={{ borderColor }}` inline vence qualquer classe.
+   */
   const inputClass =
-    "min-h-[52px] w-full rounded-xl border bg-white px-4 text-[1rem] outline-none transition-colors placeholder:text-[rgba(7, 10, 38,0.38)] focus:border-[#4544BD]";
+    "min-h-[52px] w-full rounded-xl border bg-white px-4 text-[1rem] transition-colors placeholder:text-[rgba(7,10,38,0.55)]";
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
@@ -79,9 +90,31 @@ export function LeadForm() {
       });
 
       if (!response.ok) {
-        const data: { message?: string } = await response.json().catch(() => ({}));
+        const data: {
+          message?: string;
+          fieldErrors?: Partial<Record<keyof FormValues, string[]>>;
+        } = await response.json().catch(() => ({}));
         track("lead_error", { status: response.status });
-        setServerError(data.message ?? "Não conseguimos enviar agora. Tente novamente.");
+
+        // 422 vem com `fieldErrors`, nao com `message`: joga cada erro no campo
+        // que o gerou em vez de mostrar so o aviso generico no rodape do form.
+        const fieldErrors = data.fieldErrors;
+        let mostrouNoCampo = false;
+        if (fieldErrors) {
+          for (const [campo, mensagens] of Object.entries(fieldErrors)) {
+            const mensagem = mensagens?.[0];
+            if (!mensagem) continue;
+            setError(campo as keyof FormValues, { type: "server", message: mensagem });
+            mostrouNoCampo = true;
+          }
+        }
+
+        setServerError(
+          data.message ??
+            (mostrouNoCampo
+              ? "Confira os campos destacados e envie de novo."
+              : "Não conseguimos enviar agora. Tente novamente."),
+        );
         return;
       }
 
@@ -98,15 +131,30 @@ export function LeadForm() {
       id="baixar"
       className="scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.5)] md:p-8"
     >
-      <p className="font-serif text-[1.375rem] font-bold leading-tight" style={{ color: INK }}>
+      {/*
+        h2, nao <p>: o formulario e o elemento de conversao do site e nao tinha
+        heading nem nome acessivel — nao aparecia na navegacao por headings nem
+        na de landmarks. O leitor de tela so chegava nele tabulando o hero todo.
+      */}
+      <h2
+        id={`${id}-titulo`}
+        className="font-serif text-[1.375rem] font-bold leading-tight"
+        style={{ color: INK }}
+      >
         {hero.formTitle}
-      </p>
+      </h2>
       <p className="mt-1.5 text-[0.9375rem]" style={{ color: MUTED }}>
         {hero.formSubtitle}
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        aria-labelledby={`${id}-titulo`}
+        className="mt-6 flex flex-col gap-4"
+        noValidate
+      >
         <Field label="Nome" htmlFor={`${id}-nome`} error={errors.nome?.message}>
+          {(erroId) => (
           <input
             id={`${id}-nome`}
             type="text"
@@ -115,14 +163,18 @@ export function LeadForm() {
             className={inputClass}
             style={{ borderColor: errors.nome ? DANGER : BORDER, color: INK }}
             aria-invalid={Boolean(errors.nome)}
+            aria-describedby={erroId}
+            aria-required="true"
             {...register("nome", {
               required: "Informe seu nome.",
               minLength: { value: 2, message: "Informe seu nome." },
             })}
           />
+          )}
         </Field>
 
         <Field label="E-mail corporativo" htmlFor={`${id}-email`} error={errors.email?.message}>
+          {(erroId) => (
           <input
             id={`${id}-email`}
             type="email"
@@ -132,14 +184,18 @@ export function LeadForm() {
             className={inputClass}
             style={{ borderColor: errors.email ? DANGER : BORDER, color: INK }}
             aria-invalid={Boolean(errors.email)}
+            aria-describedby={erroId}
+            aria-required="true"
             {...register("email", {
               required: "Informe seu e-mail.",
               pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, message: "E-mail inválido." },
             })}
           />
+          )}
         </Field>
 
         <Field label="WhatsApp / Telefone" htmlFor={`${id}-telefone`} error={errors.telefone?.message}>
+          {(erroId) => (
           <input
             id={`${id}-telefone`}
             type="tel"
@@ -149,14 +205,18 @@ export function LeadForm() {
             className={inputClass}
             style={{ borderColor: errors.telefone ? DANGER : BORDER, color: INK }}
             aria-invalid={Boolean(errors.telefone)}
+            aria-describedby={erroId}
+            aria-required="true"
             {...register("telefone", {
               required: "Informe seu telefone / WhatsApp.",
               minLength: { value: 10, message: "Telefone inválido." },
             })}
           />
+          )}
         </Field>
 
         <Field label="Empresa" htmlFor={`${id}-empresa`} error={errors.empresa?.message}>
+          {(erroId) => (
           <input
             id={`${id}-empresa`}
             type="text"
@@ -165,11 +225,14 @@ export function LeadForm() {
             className={inputClass}
             style={{ borderColor: errors.empresa ? DANGER : BORDER, color: INK }}
             aria-invalid={Boolean(errors.empresa)}
+            aria-describedby={erroId}
+            aria-required="true"
             {...register("empresa", {
               required: "Informe a empresa.",
               minLength: { value: 2, message: "Informe a empresa." },
             })}
           />
+          )}
         </Field>
 
         {/* Honeypot */}
@@ -184,16 +247,23 @@ export function LeadForm() {
               type="checkbox"
               className="mt-0.5 h-[18px] w-[18px] flex-none accent-[#4544BD]"
               aria-invalid={Boolean(errors.consent)}
+              aria-describedby={errors.consent ? `${id}-consent-erro` : undefined}
+              aria-required="true"
               {...register("consent", { required: "É preciso aceitar para receber o material." })}
             />
             <span>
-              Autorizo o envio do e-book e de comunicações da {""}
-              <strong style={{ color: INK }}>Vita Saúde</strong> para o meu e-mail. Posso cancelar
-              quando quiser.
+              Autorizo o envio do e-book e de comunicações da{" "}
+              <strong style={{ color: INK }}>Vita Saúde</strong> para o meu e-mail e WhatsApp.
+              Posso cancelar quando quiser.
             </span>
           </label>
           {errors.consent ? (
-            <p role="alert" className="text-[0.8125rem]" style={{ color: DANGER }}>
+            <p
+              id={`${id}-consent-erro`}
+              role="alert"
+              className="text-[0.8125rem]"
+              style={{ color: DANGER }}
+            >
               {errors.consent.message}
             </p>
           ) : null}
@@ -213,7 +283,7 @@ export function LeadForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="group inline-flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-full text-[0.9375rem] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
+          className="group inline-flex min-h-[54px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-full text-[0.9375rem] font-bold transition-all duration-200 hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
           style={{ background: "#FEC717", color: INK }}
         >
           {isSubmitting ? (

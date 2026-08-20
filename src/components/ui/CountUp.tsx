@@ -79,6 +79,13 @@ export function CountUp({ value, duration = 1.6, delay = 0, className, style }: 
       ref={ref}
       className={cn("tabular-nums", className)}
       style={{ fontVariantNumeric: "lining-nums tabular-nums", ...style }}
+      /*
+       * `role="img"` e obrigatorio aqui: nome vindo do autor e PROIBIDO em
+       * role=generic, entao um <span aria-label> puro tem o label descartado
+       * por Chrome/Firefox. Como o conteudo interno e aria-hidden (ele muda
+       * durante a contagem), o numero era anunciado como nada.
+       */
+      role="img"
       aria-label={value}
     >
       <span aria-hidden>

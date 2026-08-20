@@ -1,14 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Logo } from "./Logo";
 import { CTALink } from "@/components/ui/layout/CTALink";
 
+/**
+ * Caminho absoluto (`/#secao`), nao fragmento puro (`#secao`).
+ * A Navbar e o Footer sao globais: em /privacidade e /obrigado essas seces nao
+ * existem, e o link de fragmento puro simplesmente nao fazia nada.
+ */
 const LINKS = [
-  { href: "#o-guia", label: "O guia" },
-  { href: "#autora", label: "A autora" },
-  { href: "#faq", label: "Dúvidas" },
+  { href: "/#o-guia", label: "O guia" },
+  { href: "/#autora", label: "A autora" },
+  { href: "/#faq", label: "Dúvidas" },
 ] as const;
 
 export function Navbar() {
@@ -38,39 +44,21 @@ export function Navbar() {
         <ul className="hidden items-center gap-8 md:flex">
           {LINKS.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="nav-link relative text-[0.9375rem] font-medium transition-colors"
                 style={{ color: "rgba(249, 249, 251, 0.78)" }}
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
 
-        <CTALink href="#baixar" variant="ghost-light" className="min-h-[44px] px-5 text-[0.875rem]">
+        <CTALink href="/#baixar" variant="ghost-light" className="min-h-[44px] px-5 text-[0.875rem]">
           Baixar o guia
         </CTALink>
       </nav>
-
-      {/* Underline amarelo animado — instrucao explicita de navbar do briefing */}
-      <style>{`
-        .nav-link::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          bottom: -6px;
-          height: 2px;
-          width: 100%;
-          background: #FEC717;
-          transform: scaleX(0);
-          transform-origin: right;
-          transition: transform 220ms ease;
-        }
-        .nav-link:hover { color: #F9F9FB; }
-        .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
-      `}</style>
     </header>
   );
 }
