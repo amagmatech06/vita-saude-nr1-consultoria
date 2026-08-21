@@ -3,7 +3,15 @@
  * Itens marcados com [PLACEHOLDER] precisam ser preenchidos pela cliente.
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitasaude.com.br";
+/**
+ * Dominio canonico. Registrado no registro.br.
+ *
+ * O fallback existe para o build nao quebrar sem env, mas ele define canonical,
+ * og:url, sitemap e o link do PDF no e-mail — um valor errado aqui aponta o
+ * site inteiro para um dominio que nao e nosso. `NEXT_PUBLIC_*` e embutida no
+ * BUILD: mudar na Vercel exige rebuild para ter efeito.
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitasaudecorporativa.com.br";
 
 export const site = {
   /** Nome curto, usado na navbar e no titulo das paginas */

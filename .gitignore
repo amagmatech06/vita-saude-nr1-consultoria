@@ -46,3 +46,6 @@ public/static
 
 # o exemplo deve ser versionado; os .env reais nao
 !.env.example
+
+# adicionado pelo `vercel link`
+.vercel
