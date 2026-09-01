@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 
 import { DownloadIcon } from "@/components/icons";
 import { hero } from "@/config/ebook-content";
+import { COLABORADORES_OPCOES, type Colaboradores } from "@/config/lead-options";
 import { track } from "@/lib/analytics";
 
 type FormValues = {
@@ -13,6 +14,7 @@ type FormValues = {
   email: string;
   telefone: string;
   empresa: string;
+  colaboradores: Colaboradores | "";
   consent: boolean;
   /** Honeypot — invisivel para pessoas, preenchido por bots. */
   website: string;
@@ -66,10 +68,22 @@ export function LeadForm() {
     register,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    defaultValues: { nome: "", email: "", telefone: "", empresa: "", consent: false, website: "" },
+    defaultValues: {
+      nome: "",
+      email: "",
+      telefone: "",
+      empresa: "",
+      colaboradores: "",
+      consent: false,
+      website: "",
+    },
   });
+
+  /** Sem valor escolhido, o <select> precisa parecer placeholder, e nao resposta. */
+  const colaboradores = watch("colaboradores");
 
   /**
    * A utility que zera o outline nao entra aqui: ela fica na layer `utilities`, que vence o
@@ -118,7 +132,7 @@ export function LeadForm() {
         return;
       }
 
-      track("lead_submit", { empresa: values.empresa });
+      track("lead_submit", { empresa: values.empresa, colaboradores: values.colaboradores });
       router.push("/obrigado?ref=form");
     } catch {
       track("lead_error", { status: 0 });
@@ -232,6 +246,44 @@ export function LeadForm() {
               minLength: { value: 2, message: "Informe a empresa." },
             })}
           />
+          )}
+        </Field>
+
+        <Field
+          label="Quantos colaboradores tem na sua empresa?"
+          htmlFor={`${id}-colaboradores`}
+          error={errors.colaboradores?.message}
+        >
+          {(erroId) => (
+          <select
+            id={`${id}-colaboradores`}
+            /*
+              `appearance-none` + seta desenhada: a seta nativa do Windows/Chrome
+              vem quase preta e destoa do resto do card. O padding a direita
+              reserva o espaco dela para o texto nao passar por baixo.
+            */
+            className={`${inputClass} cursor-pointer appearance-none bg-[length:12px] bg-[right_1rem_center] bg-no-repeat py-0 pr-11`}
+            style={{
+              borderColor: errors.colaboradores ? DANGER : BORDER,
+              // Sem escolha, o texto e o placeholder — mesma cor do dos inputs.
+              color: colaboradores ? INK : "rgba(7, 10, 38, 0.55)",
+              backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23070A26' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
+            }}
+            aria-invalid={Boolean(errors.colaboradores)}
+            aria-describedby={erroId}
+            aria-required="true"
+            {...register("colaboradores", { required: "Selecione o porte da empresa." })}
+          >
+            <option value="" disabled>
+              Selecione uma opção
+            </option>
+            {COLABORADORES_OPCOES.map((opcao) => (
+              <option key={opcao} value={opcao} style={{ color: INK }}>
+                {opcao}
+              </option>
+            ))}
+          </select>
           )}
         </Field>
 

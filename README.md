@@ -3,7 +3,8 @@
 Página de captura do e-book gratuito **NR-1 na Prática — O Guia Completo para
 Gestão de Riscos Psicossociais nas Empresas**, de Gabriela Moreira.
 
-O visitante preenche nome, e-mail, telefone/WhatsApp e empresa; o lead é gravado
+O visitante preenche nome, e-mail, telefone/WhatsApp, empresa e o porte dela; o
+lead é gravado
 no Supabase, recebe o PDF por e-mail (Brevo) e o link por WhatsApp (Evolution
 API), e também pode baixar na hora em `/obrigado`.
 
@@ -64,6 +65,15 @@ npm run dev                    # http://localhost:3000
 > marcado `[ATENCAO]` — é o único aviso de que um lead pode ter se perdido.
 
 > **O remetente precisa de domínio verificado na Brevo** para produção.
+
+### Banco (Supabase)
+
+A tabela `public.leads` guarda `nome`, `email`, `telefone`, `empresa` e
+`colaboradores` (a pergunta qualificatória de porte da empresa).
+
+As alterações de schema ficam em [`sql/`](./sql) e precisam ser rodadas no SQL
+Editor do Supabase **antes** do deploy que as usa — sem a coluna, o `insert`
+falha inteiro e o lead só chega pelo e-mail `[ATENCAO]`.
 
 ---
 

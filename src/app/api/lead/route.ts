@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 
+import { COLABORADORES_OPCOES } from "@/config/lead-options";
 import { site } from "@/config/site";
 
 export const runtime = "nodejs";
@@ -29,6 +30,8 @@ const leadSchema = z.object({
   email: z.email("E-mail inválido.").max(160),
   telefone: z.string().trim().min(10, "Telefone inválido.").max(20),
   empresa: z.string().trim().min(2, "Informe a empresa.").max(120),
+  /** Pergunta qualificatoria: so aceita os rotulos exatos do <select>. */
+  colaboradores: z.enum(COLABORADORES_OPCOES, { message: "Selecione o porte da empresa." }),
   consent: z.literal(true, { message: "É preciso aceitar para receber o material." }),
   /**
    * Honeypot: preenchido apenas por bots. Aceita qualquer valor de proposito —
@@ -81,7 +84,13 @@ function emailHtml(nome: string, downloadUrl: string) {
 </body></html>`;
 }
 
-type Lead = { nome: string; email: string; telefone: string; empresa: string };
+type Lead = {
+  nome: string;
+  email: string;
+  telefone: string;
+  empresa: string;
+  colaboradores: string;
+};
 
 /**
  * Alerta interno. Antes vivia DEPOIS do `return` do erro da Brevo, entao so
@@ -99,6 +108,7 @@ async function notificarLead(lead: Lead, alerta?: string) {
     `E-mail: ${lead.email}`,
     `Telefone: ${lead.telefone}`,
     `Empresa: ${lead.empresa}`,
+    `Colaboradores: ${lead.colaboradores}`,
     "Origem: landing do e-book",
     ...(alerta ? ["", `*** ${alerta} — registre este lead manualmente. ***`] : []),
   ];
@@ -116,8 +126,8 @@ async function notificarLead(lead: Lead, alerta?: string) {
         sender: { name: process.env.BREVO_SENDER_NAME || "Vita Saúde", email: senderEmail },
         to: [{ email: notify }],
         subject: alerta
-          ? `[ATENCAO] Lead: ${lead.nome} — ${lead.empresa}`
-          : `Novo lead: ${lead.nome} — ${lead.empresa}`,
+          ? `[ATENCAO] Lead: ${lead.nome} — ${lead.empresa} (${lead.colaboradores})`
+          : `Novo lead: ${lead.nome} — ${lead.empresa} (${lead.colaboradores})`,
         textContent: linhas.join("\n")
       })
     });
@@ -152,12 +162,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, fieldErrors }, { status: 422 });
   }
 
-  const { nome, email, telefone, empresa, website } = parsed.data;
+  const { nome, email, telefone, empresa, colaboradores, website } = parsed.data;
 
   // Honeypot preenchido: responde 200 para nao dar pista ao bot.
   if (website) return NextResponse.json({ ok: true });
 
-  const lead: Lead = { nome, email, telefone, empresa };
+  const lead: Lead = { nome, email, telefone, empresa, colaboradores };
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -167,7 +177,9 @@ export async function POST(request: Request) {
 
   if (supabaseUrl && supabaseKey) {
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const { error: dbError } = await supabase.from('leads').insert([{ nome, email, telefone, empresa }]);
+    const { error: dbError } = await supabase
+      .from('leads')
+      .insert([{ nome, email, telefone, empresa, colaboradores }]);
     if (dbError) {
       console.error("[lead] Falha ao inserir no Supabase:", dbError);
     } else {
