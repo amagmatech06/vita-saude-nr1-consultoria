@@ -56,13 +56,33 @@ npm run dev                    # http://localhost:3000
 | `BREVO_SENDER_NAME` | não | Nome exibido no remetente |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | sim | Onde o lead é persistido |
 | `EVOLUTION_API_URL` / `_KEY` / `_INSTANCE` | não | Envio automático por WhatsApp |
+| `EVOLUTION_GROUP_JID` | não | Grupo de WhatsApp que recebe um aviso a cada lead (`1203…@g.us`) |
 | `NEXT_PUBLIC_GTM_ID` | não | Sem ele os eventos de conversão não são coletados |
 | `LEAD_NOTIFICATION_TO` | não | Recebe uma cópia de cada lead novo |
 | `EMAIL_ATTACH_PDF` | não | `false` desliga o anexo e envia só o link (ver nota abaixo) |
 
-> **Sem `BREVO_API_KEY` o site não quebra**, mas o e-mail não sai. Se
-> `LEAD_NOTIFICATION_TO` estiver configurado, a falha gera um alerta interno
-> marcado `[ATENCAO]` — é o único aviso de que um lead pode ter se perdido.
+> **Sem `BREVO_API_KEY` o site não quebra**, mas o e-mail não sai. A falha gera
+> um alerta interno marcado `[ATENCAO]` nos dois canais configurados —
+> `LEAD_NOTIFICATION_TO` (e-mail) e `EVOLUTION_GROUP_JID` (grupo de WhatsApp).
+> **Configure pelo menos um**, senão um lead pode se perder sem ninguém saber.
+
+### Aviso de lead novo no grupo de WhatsApp
+
+Com `EVOLUTION_GROUP_JID` preenchido, cada lead cadastrado gera um recado no
+grupo do time com nome, e-mail, telefone, empresa e porte. Quando algo falha
+(banco ou e-mail), o mesmo recado vem marcado como problema, pedindo registro
+manual.
+
+O valor é o **JID do grupo**, não um telefone. Para descobrir, com a instância
+conectada:
+
+```bash
+curl -H "apikey: $EVOLUTION_API_KEY"   "$EVOLUTION_API_URL/group/fetchAllGroups/$EVOLUTION_API_INSTANCE?getParticipants=false"
+```
+
+O número da instância precisa ser membro do grupo. Os dois canais são
+independentes de propósito: o aviso de que a Brevo caiu não pode depender da
+Brevo.
 
 > **O remetente precisa de domínio verificado na Brevo** para produção.
 

@@ -93,28 +93,91 @@ type Lead = {
 };
 
 /**
- * Alerta interno. Antes vivia DEPOIS do `return` do erro da Brevo, entao so
- * disparava no caminho feliz — exatamente quando nao era necessario. Agora roda
- * em todos os caminhos, e `alerta` diz o que deu errado.
+ * Dado do lead indo para dentro de uma mensagem: tira quebra de linha e
+ * caractere de controle para ninguem forjar uma linha inteira — um `nome`
+ * terminado em "\n*** " imitaria o aviso de erro do proprio alerta.
  */
-async function notificarLead(lead: Lead, alerta?: string) {
+function linhaSegura(valor: string, max = 120) {
+  return valor.replace(/[\r\n\t\u0000-\u001F\u007F]/g, " ").trim().slice(0, max);
+}
+
+/** Envia um texto pela Evolution. Diz se saiu, e nunca lanca. */
+async function enviarWhatsApp(destino: string, texto: string, comDelay = true) {
+  const url = process.env.EVOLUTION_API_URL;
+  const key = process.env.EVOLUTION_API_KEY;
+  const instance = process.env.EVOLUTION_API_INSTANCE;
+  if (!url || !key || !instance) return false;
+
+  try {
+    const req = await fetch(`${url}/message/sendText/${instance}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": key },
+      signal: comTimeout(),
+      body: JSON.stringify({
+        number: destino,
+        // O "digitando..." e para o lead, que le aquilo como conversa. No grupo
+        // interno ele so somaria 1,2s a latencia de cada envio.
+        ...(comDelay ? { options: { delay: 1200, presence: "composing" } } : {}),
+        text: texto,
+      }),
+    });
+
+    // Sem PII no log: a Evolution devolve o payload enviado no corpo do erro.
+    if (!req.ok) console.error("[lead] Evolution recusou o envio:", req.status);
+    return req.ok;
+  } catch (e) {
+    console.error("[lead] Falha ao enviar WhatsApp:", e);
+    return false;
+  }
+}
+
+/** Resumo do lead, igual nos dois canais de alerta. */
+function resumoLead(lead: Lead) {
+  return [
+    `Nome: ${linhaSegura(lead.nome, 80)}`,
+    `E-mail: ${linhaSegura(lead.email, 160)}`,
+    `Telefone: ${linhaSegura(lead.telefone, 20)}`,
+    `Empresa: ${linhaSegura(lead.empresa, 120)}`,
+    `Colaboradores: ${lead.colaboradores}`,
+    "Origem: landing do e-book",
+  ];
+}
+
+/**
+ * Recado no grupo de WhatsApp do time — um por lead cadastrado.
+ *
+ * `EVOLUTION_GROUP_JID` e o ID do grupo, no formato `1203...@g.us`; nao e um
+ * numero de telefone. Sem ele configurado, nada e enviado.
+ */
+async function notificarGrupo(lead: Lead, alerta?: string) {
+  const grupo = process.env.EVOLUTION_GROUP_JID;
+  if (!grupo) return false;
+
+  const linhas = [
+    alerta ? "*Lead com problema no cadastro*" : "*Novo lead cadastrado!*",
+    "",
+    ...resumoLead(lead),
+    ...(alerta ? ["", `*${linhaSegura(alerta)}* — registre este lead manualmente.`] : []),
+  ];
+
+  return enviarWhatsApp(grupo, linhas.join("\n"), false);
+}
+
+async function notificarPorEmail(lead: Lead, alerta?: string) {
   const notify = process.env.LEAD_NOTIFICATION_TO;
   const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = process.env.BREVO_SENDER_EMAIL;
-  if (!notify || !apiKey || !senderEmail) return;
+  if (!notify || !apiKey || !senderEmail) return false;
 
+  const nome = linhaSegura(lead.nome, 80);
+  const empresa = linhaSegura(lead.empresa, 120);
   const linhas = [
-    `Nome: ${lead.nome}`,
-    `E-mail: ${lead.email}`,
-    `Telefone: ${lead.telefone}`,
-    `Empresa: ${lead.empresa}`,
-    `Colaboradores: ${lead.colaboradores}`,
-    "Origem: landing do e-book",
-    ...(alerta ? ["", `*** ${alerta} — registre este lead manualmente. ***`] : []),
+    ...resumoLead(lead),
+    ...(alerta ? ["", `*** ${linhaSegura(alerta)} — registre este lead manualmente. ***`] : []),
   ];
 
   try {
-    await fetch("https://api.brevo.com/v3/smtp/email", {
+    const req = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         "accept": "application/json",
@@ -126,13 +189,37 @@ async function notificarLead(lead: Lead, alerta?: string) {
         sender: { name: process.env.BREVO_SENDER_NAME || "Vita Saúde", email: senderEmail },
         to: [{ email: notify }],
         subject: alerta
-          ? `[ATENCAO] Lead: ${lead.nome} — ${lead.empresa} (${lead.colaboradores})`
-          : `Novo lead: ${lead.nome} — ${lead.empresa} (${lead.colaboradores})`,
+          ? `[ATENCAO] Lead: ${nome} — ${empresa} (${lead.colaboradores})`
+          : `Novo lead: ${nome} — ${empresa} (${lead.colaboradores})`,
         textContent: linhas.join("\n")
       })
     });
+    return req.ok;
   } catch (e) {
     console.error("[lead] Falha ao notificar internamente:", e);
+    return false;
+  }
+}
+
+/**
+ * Alerta interno. Antes vivia DEPOIS do `return` do erro da Brevo, entao so
+ * disparava no caminho feliz — exatamente quando nao era necessario. Agora roda
+ * em todos os caminhos, e `alerta` diz o que deu errado.
+ *
+ * Sao dois canais de proposito: o aviso de que a Brevo falhou nao pode depender
+ * da Brevo. O grupo do WhatsApp sai por outra infra (Evolution), entao um canal
+ * cobre a queda do outro. Os dois em paralelo para nao somar timeout.
+ */
+async function notificarLead(lead: Lead, alerta?: string) {
+  const [porEmail, porGrupo] = await Promise.allSettled([
+    notificarPorEmail(lead, alerta),
+    notificarGrupo(lead, alerta),
+  ]);
+
+  const saiu = (r: PromiseSettledResult<boolean>) => r.status === "fulfilled" && r.value;
+  if (!saiu(porEmail) && !saiu(porGrupo)) {
+    // Se nem e-mail nem grupo saiu, o log e tudo que sobrou do lead.
+    console.error("[lead] NENHUM canal de alerta funcionou.", { alerta: alerta ?? "novo lead" });
   }
 }
 
@@ -196,39 +283,16 @@ export async function POST(request: Request) {
   const brevoSenderName = process.env.BREVO_SENDER_NAME;
   const downloadUrl = `${site.url}${site.ebook.file}`;
 
-  const evoUrl = process.env.EVOLUTION_API_URL;
-  const evoKey = process.env.EVOLUTION_API_KEY;
-  const evoInstance = process.env.EVOLUTION_API_INSTANCE;
-
-  if (evoUrl && evoKey && evoInstance) {
-    try {
-      // Deixa so os numeros e adiciona 55 se nao tiver. Ex: (11) 99999-9999 -> 5511999999999
-      let number = telefone.replace(/\D/g, "");
-      if (number.length === 10 || number.length === 11) {
-        number = `55${number}`;
-      }
-      
-      const whatsAppReq = await fetch(`${evoUrl}/message/sendText/${evoInstance}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": evoKey,
-        },
-        signal: comTimeout(),
-        body: JSON.stringify({
-          number: number,
-          options: { delay: 1200, presence: "composing" },
-          text: `Olá ${nome.split(" ")[0]}, tudo bem? Seu guia da NR-1 está pronto! 🎉\n\nAcesse o link abaixo para baixar o material e começar a aplicar na sua empresa:\n\n${downloadUrl}\n\nQualquer dúvida sobre a implementação na sua empresa, é só responder por aqui.`,
-        })
-      });
-
-      if (!whatsAppReq.ok) {
-        console.error("[lead] Falha ao enviar WhatsApp:", await whatsAppReq.text());
-      }
-    } catch (e) {
-      console.error("[lead] Falha ao enviar WhatsApp:", e);
-    }
+  // Deixa so os numeros e adiciona 55 se nao tiver. Ex: (11) 99999-9999 -> 5511999999999
+  let number = telefone.replace(/\D/g, "");
+  if (number.length === 10 || number.length === 11) {
+    number = `55${number}`;
   }
+
+  await enviarWhatsApp(
+    number,
+    `Olá ${linhaSegura(nome.split(" ")[0] ?? nome, 40)}, tudo bem? Seu guia da NR-1 está pronto! 🎉\n\nAcesse o link abaixo para baixar o material e começar a aplicar na sua empresa:\n\n${downloadUrl}\n\nQualquer dúvida sobre a implementação na sua empresa, é só responder por aqui.`,
+  );
 
   // Sem chave configurada o site nao quebra: o lead e registrado e o visitante
   // segue para /obrigado, onde baixa o PDF direto.
@@ -237,6 +301,10 @@ export async function POST(request: Request) {
     console.error("[lead] BREVO_API_KEY/BREVO_SENDER_EMAIL ausentes — e-mail nao enviado.", {
       persistido: leadPersistido,
     });
+    // Este era o unico caminho de saida sem alerta nenhum: o lead sumia em
+    // silencio. O grupo do WhatsApp continua funcionando aqui, porque nao
+    // depende da Brevo.
+    await notificarLead(lead, "E-mail NAO enviado (Brevo sem chave configurada)");
     return NextResponse.json({ ok: true, emailSent: false });
   }
 
